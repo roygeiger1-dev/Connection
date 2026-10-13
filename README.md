@@ -14,7 +14,7 @@ A private map of the people you know and how they're connected.
 
 **On claude.ai (recommended).** The app is published as a private claude.ai artifact. Open it on your phone (Claude app or browser) and on your computer and you get the same map: it's stored in your own private space on that artifact, which no one else can read, even if you share the link. Claude reads your notes and answers your questions, using your Claude plan. Speech works through your keyboard's dictation (the mic key on iPhone/Android, Fn Fn on a Mac, Win+H on Windows).
 
-**Home Screen icon.** Because the app runs inside claude.ai, saving its link puts Claude's icon on your phone. Instead, open Menu → *Add to your Home Screen* (or https://roygeiger1-dev.github.io/Connection/kith/?add) and use Share → Add to Home Screen there: you get the Kith icon, and it opens the same live app.
+**Home Screen icon.** Because the app runs inside claude.ai, saving its link puts Claude's icon on your phone. Instead, open Menu → *Add to your Home Screen* (or https://roygeiger1-dev.github.io/Connection/kith/ in Safari) and use Share → Add to Home Screen there: you get the Kith icon, and it opens the same live app.
 
 **Standalone copy.** `index.html` is a self-contained, installable web app (PWA). Hosted anywhere over HTTPS (for example GitHub Pages) you can "Add to Home Screen" on your phone and "Install" on desktop. It keeps the map in that browser only (use Export/Import to move it between devices), uses the browser's built-in speech recognition for the mic button, and reads notes / answers questions with an on-device parser instead of Claude.
 

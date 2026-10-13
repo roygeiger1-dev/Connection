@@ -5,19 +5,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Kith</title>
 <meta name="apple-mobile-web-app-title" content="Kith">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0d1116">
 <link rel="icon" href="../icons/icon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="../icons/apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <script>
   // The home-screen door to the live Kith app on claude.ai. The app itself can't set the icon a phone saves
-  // (it runs inside claude.ai), so this page carries the icon and, once saved, simply opens the app.
-  // Opened with ?add it stays put and shows how to save it, after dropping ?add so the saved icon opens the app.
+  // (it runs inside claude.ai), so this page carries the icon. Launched from the home screen it runs as a web app
+  // and goes straight to Kith; opened anywhere else it shows how to save it. It never rewrites its own URL, so it
+  // still shows the steps when another app hands it over to Safari.
   var APP = 'https://claude.ai/artifact/H9b3EVFHtbr1E5BkgF32oW';
-  var adding = /[?&#]add\b/.test(location.search + location.hash);
-  document.documentElement.className = adding ? 'adding' : 'going';
-  if (adding) history.replaceState(null, '', location.pathname);
-  else location.replace(APP);
+  var launched = navigator.standalone === true ||
+    window.matchMedia('(display-mode: standalone), (display-mode: fullscreen), (display-mode: minimal-ui)').matches ||
+    /[?&]go\b/.test(location.search);
+  document.documentElement.className = launched ? 'going' : 'adding';
+  if (launched) location.replace(APP);
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -35,6 +40,7 @@
   ol { list-style: none; margin: 0; padding: 0; width: 100%; display: grid; gap: 8px; text-align: left; }
   li { display: grid; grid-template-columns: 28px 1fr; gap: 12px; align-items: center; padding: 13px 14px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); font-weight: 600; }
   li b { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--hl); color: #2a2000; font: 800 14px/1 "Figtree", sans-serif; }
+  li small { display: block; margin-top: 2px; font-weight: 500; font-size: 13.5px; color: var(--muted); }
   li svg { width: 20px; height: 20px; vertical-align: -4px; margin: 0 2px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
   .open { display: inline-flex; align-items: center; justify-content: center; height: 48px; padding: 0 22px; border-radius: 14px; background: var(--ink); color: var(--bg); font-weight: 700; text-decoration: none; }
   .note { font-size: 14px; color: var(--muted); max-width: 34ch; }
@@ -55,14 +61,14 @@
     <div class="adding-only steps">
       <h1>Put Kith on your Home Screen</h1>
       <ol class="ios">
-        <li><b>1</b><span>Tap Share <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M8.5 10H6.5A1.5 1.5 0 0 0 5 11.5v8A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5v-8a1.5 1.5 0 0 0-1.5-1.5h-2"/></svg> in Safari</span></li>
-        <li><b>2</b><span>Choose <em>Add to Home Screen</em> (scroll down if you don’t see it)</span></li>
-        <li><b>3</b><span>Tap <em>Add</em></span></li>
+        <li><b>1</b><span>Make sure this page is open in Safari<small>If it opened inside another app, use that app’s <em>Open in Safari</em> first.</small></span></li>
+        <li><b>2</b><span>Tap Share <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M8.5 10H6.5A1.5 1.5 0 0 0 5 11.5v8A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5v-8a1.5 1.5 0 0 0-1.5-1.5h-2"/></svg>, then <em>Add to Home Screen</em><small>Scroll down or tap <em>More</em> if you don’t see it.</small></span></li>
+        <li><b>3</b><span>Check the preview shows this dark K, then tap <em>Add</em><small>If you see <em>Open as Web App</em>, leave it on.</small></span></li>
       </ol>
       <ol class="android">
         <li><b>1</b><span>Tap the menu <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="12" cy="19" r="1.2"/></svg> in Chrome</span></li>
-        <li><b>2</b><span>Choose <em>Add to Home screen</em></span></li>
-        <li><b>3</b><span>Tap <em>Add</em></span></li>
+        <li><b>2</b><span>Choose <em>Add to Home screen</em> or <em>Install app</em></span></li>
+        <li><b>3</b><span>Tap <em>Add</em> or <em>Install</em></span></li>
       </ol>
       <p class="note">The icon opens your live Kith map, so it’s always the latest version with all your people.</p>
       <a class="open" href="https://claude.ai/artifact/H9b3EVFHtbr1E5BkgF32oW">Open Kith now</a>
