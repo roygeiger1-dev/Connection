@@ -89,7 +89,6 @@
     erase: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
     loader: '<path d="M12 3a9 9 0 1 0 9 9" />',
     bell: '<path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2H4.5Z"/><path d="M10 21h4"/>',
-    calendar: '<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/><path d="M8 14h3v3H8z" fill="currentColor" stroke="none"/>',
     clock: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
     cake: '<path d="M4 20h16M5 20v-7a1.5 1.5 0 0 1 1.5-1.5h11A1.5 1.5 0 0 1 19 13v7"/><path d="M5 15.5c1.2 1 2.3 1 3.5 0s2.3-1 3.5 0 2.3 1 3.5 0 2.3-1 3.5 0M12 11.5V8M12 5.5v.1"/>',
     contacts: '<rect x="5" y="3" width="15" height="18" rx="2.5"/><circle cx="12.5" cy="10" r="2.6"/><path d="M8.5 16.5a4 4 0 0 1 8 0M3 7.5h3M3 12h3M3 16.5h3"/>',
@@ -1311,8 +1310,9 @@
     const knob = h('button', { class: 'knob', type: 'button', 'data-id': p.id, tabindex: '-1', 'aria-label': `Connect ${isMe ? 'yourself' : label} to someone`, title: 'Drag onto someone to connect' }, icon('link', 14));
     const sub = isMe ? p.name || '' : p.company || p.title || p.location || '';
     const ds = dueState(p);
-    const badge = ds ? h('span', { class: 'due ' + ds, title: ds === 'due' ? 'Time to catch up' : 'Birthday coming up' }) : '';
-    el.replaceChildren(av, knob, badge, h('div', { class: 'nm' }, label), sub ? h('div', { class: 'sub' }, sub) : '');
+    const ring = ds ? h('span', { class: 'ring ' + ds, title: ds === 'due' ? 'Time to catch up' : 'Birthday coming up' }) : '';
+    el.classList.toggle('is-due', ds === 'due');
+    el.replaceChildren(ring, av, knob, h('div', { class: 'nm' }, label), sub ? h('div', { class: 'sub' }, sub) : '');
     el.setAttribute('aria-label', isMe ? 'You' : label);
   }
   function renderNodes() {
@@ -1485,6 +1485,7 @@
     const rels = relList();
     const counts = {};
     for (const r of rels) counts[r.category] = (counts[r.category] || 0) + 1;
+    E.app.classList.toggle('has-filters', !!rels.length);
     if (!rels.length) { E.filters.replaceChildren(); S.filter = 'all'; return; }
     if (S.filter !== 'all' && !counts[S.filter]) S.filter = 'all';
     const chips = [h('button', { class: 'chip glass', type: 'button', 'aria-pressed': String(S.filter === 'all'), onclick: () => setFilter('all') }, 'All', h('span', { class: 'n' }, rels.length))];
@@ -1506,6 +1507,7 @@
     E.empty.hidden = !(S.ready && n === 0);
     syncBadge();
     renderTouchBadge();
+    renderDueBanner();
   }
   function render() {
     renderNodes();
@@ -2363,7 +2365,6 @@
     }
     wrap.append(h('div', { class: 'touch-card' + state }, icon(i && i.left <= 0 ? 'bell' : 'clock', 20), h('div', {}, lines)));
     wrap.append(cadencePicker(i ? i.cadence : 0, (d) => setCadence(p.id, d), true));
-    wrap.append(h('div', { class: 'cal-wrap' }, calRow(p)));
     const log = p.log || [];
     if (log.length) {
       const show = args.allLog ? log : log.slice(0, 4);
@@ -2441,6 +2442,32 @@
   };
   VIEWS.touch.live = true;
 
+  function renderDueBanner() {
+    if (!E.dueBanner) return;
+    const due = others().map((p) => ({ p, i: dueInfo(p) })).filter((r) => r.i && r.i.left <= 0).sort((a, b) => a.i.left - b.i.left);
+    const key = todayStr() + ':' + due.map((r) => r.p.id).join(',');
+    const off = !due.length || lsGet('kith.banner.hide') === key;
+    E.dueBanner.hidden = off;
+    E.app.classList.toggle('has-due', !off);
+    if (off) return;
+    const shown = due.slice(0, 3);
+    const when = (i) => (i.left === 0 ? 'Due today' : `${relDays(-i.left).replace(/^in /, '')} overdue`);
+    E.dueBanner.replaceChildren(
+      h(
+        'div',
+        { class: 'db-head' },
+        h('span', { class: 'db-dot', 'aria-hidden': 'true' }),
+        h('button', { class: 'db-title', type: 'button', onclick: () => openSheet('touch', {}, { root: true }) }, 'Time to catch up', h('span', { class: 'db-n' }, due.length)),
+        h('button', { class: 'icon-btn db-x', type: 'button', 'aria-label': 'Hide until tomorrow', title: 'Hide until tomorrow', onclick: () => { lsSet('kith.banner.hide', key); renderDueBanner(); } }, icon('x', 15)),
+      ),
+      h(
+        'div',
+        { class: 'db-list' },
+        shown.map((r) => h('button', { class: 'db-person', type: 'button', onclick: () => selectPerson(r.p.id, { open: true, center: true }) }, h('span', { class: 'db-av' }, avatar(r.p)), h('span', { class: 'db-name' }, r.p.name || 'Unnamed'), h('span', { class: 'db-when' }, when(r.i)))),
+        due.length > shown.length ? h('button', { class: 'db-more', type: 'button', onclick: () => openSheet('touch', {}, { root: true }) }, `+${due.length - shown.length} more`) : '',
+      ),
+    );
+  }
   function renderTouchBadge() {
     if (!E.touchBadge) return;
     const n = remindersNow();
@@ -2854,213 +2881,6 @@
         onData();
       },
     });
-  }
-
-  /* =====================================================================
-     Google Calendar: put a catch-up on the calendar (connector, or a pre-filled link)
-     ===================================================================== */
-  const CAL = { mcp: null, server: 'Google Calendar' };
-  async function initCalendar() {
-    if (!window.claude || typeof window.claude.use !== 'function') return;
-    try { CAL.mcp = await window.claude.use('mcp'); } catch { CAL.mcp = null; }
-    if (sheetIsOpen()) refreshSheet();
-  }
-  const RRULES = { 7: 'FREQ=WEEKLY', 14: 'FREQ=WEEKLY;INTERVAL=2', 30: 'FREQ=MONTHLY', 90: 'FREQ=MONTHLY;INTERVAL=3', 180: 'FREQ=MONTHLY;INTERVAL=6', 365: 'FREQ=YEARLY' };
-  function localStamp(date, time, addMin = 0) {
-    const [y, m, d] = date.split('-').map(Number);
-    const [hh, mm] = (time || '10:00').split(':').map(Number);
-    const dt = new Date(y, m - 1, d, hh || 0, (mm || 0) + addMin);
-    return `${dt.getFullYear()}-${pad2(dt.getMonth() + 1)}-${pad2(dt.getDate())}T${pad2(dt.getHours())}:${pad2(dt.getMinutes())}:00`;
-  }
-  function calSuggestDate(p) {
-    const i = dueInfo(p);
-    const t = todayNum();
-    let n = i ? Math.max(i.due, t) : t + 14;
-    if (n === t && new Date().getHours() >= 10) n = t + 1;
-    return fromDayNum(n);
-  }
-  const calActive = (p) => !!(p && p.cal && p.cal.date && (p.cal.rec || p.cal.date >= todayStr()));
-  function calDetails(p) {
-    const i = dueInfo(p);
-    const lines = [];
-    if (i) lines.push(`Keep in touch with ${p.name || 'them'} ${cadenceLabel(i.cadence).toLowerCase()}.`);
-    const last = (p.log || [])[0];
-    if (p.lastContact) lines.push(`Last talked ${fmtDay(p.lastContact)}${last && last.note && last.d === p.lastContact ? ': ' + last.note : '.'}`);
-    if (roleLine(p)) lines.push(roleLine(p) + (p.location ? ` · ${p.location}` : ''));
-    if (p.phone) lines.push('Phone: ' + p.phone);
-    if (p.email) lines.push('Email: ' + p.email);
-    lines.push('', 'Added from Kith.');
-    return lines.join('\n');
-  }
-  function calTemplateUrl({ title, date, time, rec, details }) {
-    const f = (s) => s.replace(/[-:]/g, '');
-    const q = new URLSearchParams({ action: 'TEMPLATE', text: title, dates: `${f(localStamp(date, time))}/${f(localStamp(date, time, 30))}`, details });
-    try { q.set('ctz', Intl.DateTimeFormat().resolvedOptions().timeZone); } catch { /* the calendar's own zone */ }
-    if (rec && RRULES[rec]) q.set('recur', 'RRULE:' + RRULES[rec]);
-    return 'https://calendar.google.com/calendar/render?' + q.toString();
-  }
-  function calPayload(res) {
-    let pl = res && (res.payload !== undefined ? res.payload : res);
-    if (typeof pl === 'string') {
-      const id = /"id"\s*:\s*"([^"]+)"/.exec(pl) || /event ?id[^A-Za-z0-9_]+([A-Za-z0-9_-]{6,})/i.exec(pl);
-      const link = /https:\/\/www\.google\.com\/calendar\/event\?eid=[^\s"']+|https:\/\/calendar\.google\.com\/[^\s"']+/.exec(pl);
-      return { id: id ? id[1] : '', link: link ? link[0] : '' };
-    }
-    pl = pl && typeof pl === 'object' ? pl : {};
-    const ev = pl.event && typeof pl.event === 'object' ? pl.event : pl;
-    return { id: String(ev.id || ev.eventId || pl.eventId || ''), link: String(ev.htmlLink || ev.html_link || pl.htmlLink || '') };
-  }
-  function calErrorText(e) {
-    switch (e && e.code) {
-      case 'server_not_connected': return 'Google Calendar isn’t connected to your Claude account. Add it in claude.ai under Settings → Connectors, then try again, or use the link below.';
-      case 'needs_reauth': return 'Google Calendar needs to be reconnected. Reconnect it in claude.ai under Settings → Connectors, then try again.';
-      case 'selection_required': return 'More than one Google Calendar is connected. Pick one when Claude asks, then try again.';
-      case 'not_in_manifest': return 'Calendar access is turned off for Kith. Turn it on in this page’s permissions, or use the link below.';
-      case 'approval_required': return 'The calendar request wasn’t approved. Try again and choose Allow.';
-      case 'blocked_by_policy': return 'Your organization doesn’t let this page use Google Calendar. Use the link below instead.';
-      case 'tool_error': return 'Google Calendar said: ' + ((e && e.message) || 'it couldn’t do that.');
-      case 'server_unavailable':
-      case 'upstream_error': return 'Google Calendar didn’t answer in time. The event may still have been made, so check your calendar before trying again.';
-      default: return 'Google Calendar isn’t available here. Use the link below instead.';
-    }
-  }
-  async function openPermissions() {
-    try {
-      const pm = await window.claude.use('permissions');
-      if (pm) await pm.manage();
-    } catch { toast('Open the page’s menu in Claude and choose Permissions.'); }
-  }
-  async function calCall(tool, input) {
-    if (!CAL.mcp) throw { code: 'not_granted' };
-    return CAL.mcp.callTool(CAL.server, tool, input);
-  }
-
-  VIEWS.calendar = (args) => {
-    const p = S.people[args.id];
-    if (!p) return null;
-    const i = dueInfo(p);
-    const st = args._st || (args._st = { title: `Catch up with ${p.name || 'them'}`, date: calSuggestDate(p), time: '10:00', rec: 0, details: calDetails(p) });
-    const viaConnector = !!CAL.mcp;
-    const title = h('input', { class: 'input', id: 'cal-title', value: st.title, autocomplete: 'off' });
-    title.addEventListener('input', () => { st.title = title.value; paintLink(); });
-    const date = h('input', { class: 'input', id: 'cal-date', type: 'date', value: st.date, min: todayStr() });
-    date.addEventListener('input', () => { st.date = date.value; paintLink(); });
-    const time = h('input', { class: 'input', id: 'cal-time', type: 'time', value: st.time, step: '900' });
-    time.addEventListener('input', () => { st.time = time.value || '10:00'; paintLink(); });
-    const rec = h('select', { class: 'input', id: 'cal-rec' }, h('option', { value: '0' }, 'Doesn’t repeat'), CADENCES.slice(1).map(([d, long]) => h('option', { value: String(d) }, `Repeats ${long.toLowerCase()}`)));
-    rec.value = String(st.rec);
-    rec.addEventListener('change', () => { st.rec = +rec.value; paintLink(); });
-    const details = h('textarea', { class: 'input', id: 'cal-details', rows: '4' });
-    details.value = st.details;
-    details.addEventListener('input', () => { st.details = details.value; paintLink(); });
-    const msg = h('div', { class: 'cal-msg', hidden: true });
-    const linkBtn = h('a', { class: 'btn' + (viaConnector ? '' : ' primary'), target: '_blank', rel: 'noopener noreferrer' }, icon('calendar', 18), viaConnector ? 'Open in Google Calendar instead' : 'Open in Google Calendar');
-    function paintLink() {
-      linkBtn.href = calTemplateUrl({ title: st.title.trim() || `Catch up with ${p.name}`, date: st.date || calSuggestDate(p), time: st.time, rec: st.rec, details: st.details });
-    }
-    paintLink();
-    linkBtn.addEventListener('click', () => { if (!viaConnector) setTimeout(closeSheet, 300); });
-    const body = h(
-      'form',
-      { class: 'form', onsubmit: (e) => { e.preventDefault(); add(); } },
-      h('div', { class: 'cal-head' }, avatar(p), h('div', {}, h('b', {}, p.name || 'Unnamed'), h('span', {}, i ? touchLine(p) : 'No keep-in-touch rhythm set'))),
-      h('div', { class: 'field' }, h('label', { for: 'cal-title' }, 'Event'), title),
-      h('div', { class: 'row2' }, h('div', { class: 'field' }, h('label', { for: 'cal-date' }, 'Date'), date), h('div', { class: 'field' }, h('label', { for: 'cal-time' }, 'Time'), time)),
-      h('div', { class: 'field' }, h('label', { for: 'cal-rec' }, 'Repeat'), rec),
-      h('div', { class: 'field' }, h('label', { for: 'cal-details' }, 'Notes on the event'), details),
-      h('p', { class: 'muted-note' }, viaConnector ? 'Kith adds a 30-minute reminder that doesn’t block your time. If you log a catch-up later, Kith can move a one-time event to the new date.' : 'This opens Google Calendar with the event filled in. Tap Save there to keep it.'),
-      msg,
-    );
-    const addBtn = h('button', { class: 'btn primary', type: 'button', onclick: add }, icon('calendar', 18), 'Add to Google Calendar');
-    async function add() {
-      if (!viaConnector) return;
-      if (!st.date || dayNum(st.date) == null) { msg.className = 'cal-msg err'; msg.textContent = 'Pick a date.'; msg.hidden = false; return; }
-      addBtn.disabled = true;
-      addBtn.replaceChildren(icon('calendar', 18), 'Adding…');
-      msg.hidden = true;
-      const input = {
-        summary: st.title.trim() || `Catch up with ${p.name}`,
-        startTime: localStamp(st.date, st.time),
-        endTime: localStamp(st.date, st.time, 30),
-        description: st.details,
-        availability: 'AVAILABILITY_FREE',
-        overrideReminders: [{ method: 'popup', minutes: 0 }],
-      };
-      if (st.rec && RRULES[st.rec]) input.recurrenceData = ['RRULE:' + RRULES[st.rec]];
-      try {
-        const res = await calCall('create_event', input);
-        const ev = calPayload(res);
-        const cur = S.people[p.id];
-        if (cur) savePerson({ ...cur, cal: { id: ev.id, link: /^https:\/\//.test(ev.link) ? ev.link : '', date: st.date, time: st.time, rec: st.rec || 0, title: input.summary, base: cur.lastContact || '' } });
-        onData();
-        if (Sheet.stack.length > 1) sheetBack();
-        else closeSheet();
-        toast(`Added to Google Calendar · ${fmtDay(st.date)} at ${st.time}`);
-      } catch (e) {
-        addBtn.disabled = false;
-        addBtn.replaceChildren(icon('calendar', 18), 'Try again');
-        msg.className = 'cal-msg err';
-        msg.replaceChildren(h('span', {}, calErrorText(e)));
-        if (e && e.code === 'not_in_manifest') msg.append(h('button', { class: 'btn sm', type: 'button', onclick: openPermissions }, 'Open permissions'));
-        msg.hidden = false;
-        linkBtn.className = 'btn';
-      }
-    }
-    const foot = h('div', { class: 'cal-foot' }, viaConnector ? addBtn : '', linkBtn);
-    return { title: 'Add to Google Calendar', body, foot };
-  };
-
-  async function calMove(id, date) {
-    const p = S.people[id];
-    if (!p || !p.cal || !p.cal.id) return;
-    try {
-      await calCall('update_event', { eventId: p.cal.id, startTime: localStamp(date, p.cal.time), endTime: localStamp(date, p.cal.time, 30) });
-      const cur = S.people[id];
-      savePerson({ ...cur, cal: { ...cur.cal, date, base: cur.lastContact || '' } });
-      onData();
-      toast(`Moved on Google Calendar to ${fmtDay(date)} at ${p.cal.time}`);
-    } catch (e) {
-      toast(calErrorText(e), { ms: 7000 });
-    }
-  }
-  async function calRemove(id) {
-    const p = S.people[id];
-    if (!p || !p.cal) return;
-    const forget = () => {
-      const cur = S.people[id];
-      const next = { ...cur };
-      delete next.cal;
-      savePerson(next);
-      onData();
-    };
-    if (!p.cal.id) { forget(); return; }
-    try {
-      await calCall('delete_event', { eventId: p.cal.id });
-      forget();
-      toast('Removed from Google Calendar');
-    } catch (e) {
-      if (e && e.code === 'tool_error') { forget(); toast('Kith forgot this event. ' + calErrorText(e), { ms: 7000 }); }
-      else toast(calErrorText(e), { ms: 7000 });
-    }
-  }
-  function calRow(p) {
-    if (p.id === ME) return '';
-    if (!calActive(p)) {
-      return h('button', { class: 'btn cal-add', type: 'button', onclick: () => openSheet('calendar', { id: p.id }) }, icon('calendar', 18), 'Add to Google Calendar');
-    }
-    const c = p.cal;
-    const i = dueInfo(p);
-    // after a new catch-up is logged, offer to move a one-time event to the next due date
-    const want = i && (p.lastContact || '') !== (c.base || '') ? calSuggestDate(p) : '';
-    const canEdit = !!(CAL.mcp && c.id);
-    const move = canEdit && !c.rec && want && want !== c.date ? h('button', { class: 'btn sm', type: 'button', onclick: (e) => { e.currentTarget.disabled = true; calMove(p.id, want); } }, `Move to ${fmtDay(want)}`) : '';
-    return h(
-      'div',
-      { class: 'cal-row' },
-      icon('calendar', 18),
-      h('div', {}, h('b', {}, 'On Google Calendar'), h('span', {}, `${fmtDay(c.date)} at ${c.time}${c.rec ? ' · repeats ' + cadenceLabel(c.rec).toLowerCase() : ''}`)),
-      h('div', { class: 'cal-actions' }, move, c.link ? h('a', { class: 'btn sm ghost', href: c.link, target: '_blank', rel: 'noopener noreferrer' }, 'Open') : '', canEdit ? h('button', { class: 'btn sm ghost', type: 'button', onclick: (e) => { e.currentTarget.disabled = true; calRemove(p.id); } }, 'Remove') : h('button', { class: 'btn sm ghost', type: 'button', onclick: () => calRemove(p.id) }, 'Forget')),
-    );
   }
 
   /* ---------- relationship ---------- */
@@ -3865,7 +3685,6 @@
     const photo = typeof p.photo === 'string' && /^data:image\/(jpeg|png|webp);base64,/.test(p.photo) && p.photo.length < 220000 ? p.photo : '';
     const log = Array.isArray(p.log) ? p.log.filter((e) => e && dayNum(e.d) != null).slice(0, 60).map((e) => ({ d: String(e.d).slice(0, 10), note: str(e.note).slice(0, 2000) })) : [];
     const extra = { birthday: parseBirthday(p.birthday) || (/^--\d{2}-\d{2}$/.test(p.birthday || '') ? p.birthday : ''), link: /^https?:\/\//i.test(str(p.link)) ? str(p.link).slice(0, 500) : '', cadence: nearestCadence(p.cadence), cadenceFrom: dayNum(p.cadenceFrom) != null ? String(p.cadenceFrom).slice(0, 10) : '', lastContact: dayNum(p.lastContact) != null ? String(p.lastContact).slice(0, 10) : '', log };
-    if (p.cal && typeof p.cal === 'object' && dayNum(p.cal.date) != null) extra.cal = { base: dayNum(p.cal.base) != null ? String(p.cal.base).slice(0, 10) : '', id: str(p.cal.id).slice(0, 200), link: /^https:\/\//.test(str(p.cal.link)) ? str(p.cal.link).slice(0, 500) : '', date: String(p.cal.date).slice(0, 10), time: /^\d{2}:\d{2}$/.test(str(p.cal.time)) ? str(p.cal.time) : '10:00', rec: nearestCadence(p.cal.rec), title: str(p.cal.title).slice(0, 200) };
     return { ...extra, id: p.id, kind: 'person', name: str(p.name).slice(0, 200), title: str(p.title).slice(0, 200), company: str(p.company).slice(0, 200), location: str(p.location).slice(0, 200), traits: arr(p.traits).slice(0, 60).map((t) => t.slice(0, 80)), details: str(p.details).slice(0, 20000), email: str(p.email).slice(0, 200), phone: str(p.phone).slice(0, 80), photo, x: Number.isFinite(p.x) ? Math.round(p.x) : NaN, y: Number.isFinite(p.y) ? Math.round(p.y) : NaN, example: !!p.example, createdAt: Number(p.createdAt) || now() };
   }
   function importData(d) {
@@ -4199,7 +4018,7 @@
      Boot
      ===================================================================== */
   function grab() {
-    const ids = ['app', 'stage', 'world', 'edge-g', 'ghost', 'labels', 'nodes', 'filters', 'stats', 'sync', 'empty', 'composer', 'composer-note', 'input', 'btn-mic', 'btn-send', 'btn-image', 'attach', 'hint', 'sheet', 'sheet-grab', 'sheet-head', 'sheet-title', 'sheet-body', 'sheet-foot', 'sheet-back', 'sheet-close', 'toast', 'loader', 'loader-text', 'file-image', 'file-photo', 'file-import', 'drop-zone', 'btn-search', 'btn-add', 'btn-menu', 'btn-touch', 'touch-badge', 'file-contacts', 'btn-import-empty', 'btn-zin', 'btn-zout', 'btn-fit', 'btn-example', 'btn-first'];
+    const ids = ['app', 'stage', 'world', 'edge-g', 'ghost', 'labels', 'nodes', 'filters', 'stats', 'sync', 'empty', 'composer', 'composer-note', 'input', 'btn-mic', 'btn-send', 'btn-image', 'attach', 'hint', 'sheet', 'sheet-grab', 'sheet-head', 'sheet-title', 'sheet-body', 'sheet-foot', 'sheet-back', 'sheet-close', 'toast', 'loader', 'loader-text', 'file-image', 'file-photo', 'file-import', 'drop-zone', 'btn-search', 'btn-add', 'btn-menu', 'btn-touch', 'touch-badge', 'file-contacts', 'btn-import-empty', 'due-banner', 'btn-zin', 'btn-zout', 'btn-fit', 'btn-example', 'btn-first'];
     for (const id of ids) E[id.replace(/-(\w)/g, (_, c) => c.toUpperCase())] = document.getElementById(id);
   }
   function wire() {
@@ -4353,11 +4172,6 @@
       setTimeout(() => { E.loader.hidden = true; }, 450);
       S.loadedOnce = true;
       refreshSheet();
-      const due = remindersNow();
-      if (due && lsGet('kith.nudge') !== todayStr()) {
-        lsSet('kith.nudge', todayStr());
-        setTimeout(() => toast(`${plural(due, 'person is', 'people are')} due for a catch-up`, { action: 'See', run: () => openSheet('touch', {}, { root: true }) }), 1400);
-      }
       return;
     }
     onData();
@@ -4384,7 +4198,6 @@
     let reason = 'standalone';
     if (window.claude && typeof window.claude.use === 'function') {
       initAI();
-      initCalendar();
       try {
         const [db, user] = await Promise.all([window.claude.use('db'), window.claude.use('user')]);
         const uid = user ? await user.id() : null;
