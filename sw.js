@@ -1,5 +1,5 @@
 // Offline support for the standalone copy: the app shell is network-first, fonts are cache-first.
-const CACHE = 'kith-v2';
+const CACHE = 'kith-v3';
 const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icons/icon.svg', 'icons/icon-192.png', 'icons/apple-touch-icon.png'];
 
 self.addEventListener('install', (e) => {

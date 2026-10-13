@@ -64,6 +64,7 @@
     x: '<path d="M18 6 6 18M6 6l12 12"/>',
     back: '<path d="m15 18-6-6 6-6"/>',
     right: '<path d="m9 18 6-6-6-6"/>',
+    homeAdd: '<rect x="4" y="4" width="16" height="16" rx="4.5"/><path d="M12 8.5v7M8.5 12h7"/>',
     link: '<path d="M9.5 14.5 14.5 9.5"/><path d="m11 6.5 1.4-1.4a4.2 4.2 0 0 1 6 6L17 12.5"/><path d="m13 17.5-1.4 1.4a4.2 4.2 0 0 1-6-6L7 11.5"/>',
     edit: '<path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4Z"/><path d="m13.5 6.5 4 4"/>',
     trash: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
@@ -3579,6 +3580,8 @@
   }
 
   /* ---------- menu ---------- */
+  // Saved from this page's Share menu, the phone gets the Kith icon; the app itself runs inside claude.ai, which sets its own.
+  const HOME_SCREEN_URL = 'https://roygeiger1-dev.github.io/connection/kith/?add';
   VIEWS.menu = () => {
     const hasEx = peopleList().some((p) => p.example);
     const item = (ic, t, d, fn, cls = '') => h('button', { class: 'row-btn ' + cls, type: 'button', onclick: fn }, h('span', { class: 'ico' }, icon(ic)), h('div', {}, h('div', { class: 't' }, t), d ? h('div', { class: 'd' }, d) : ''), '');
@@ -3607,6 +3610,7 @@
         item('fit', 'Fit everyone on screen', '', () => { closeSheet(); setTimeout(() => fitAll(), 50); }),
         item('bell', 'Keep in touch', 'Catch-ups that are due and upcoming birthdays', () => openSheet('touch', {}, { root: true })),
         item('contacts', 'Import contacts', 'From your phone, Google, Outlook or LinkedIn', () => openSheet('importHelp', {})),
+        cloud ? h('a', { class: 'row-btn', href: HOME_SCREEN_URL, target: '_blank', rel: 'noopener' }, h('span', { class: 'ico' }, icon('homeAdd')), h('div', {}, h('div', { class: 't' }, 'Add to your Home Screen'), h('div', { class: 'd' }, 'Opens a page to save, with the Kith icon')), '') : '',
         item('users', 'Edit your own details', 'Your name, work and notes about you', () => openSheet('personEdit', { id: ME })),
         item('download', 'Export a backup', 'Save everyone as a .json file', exportBackup),
         item('upload', 'Import a backup', 'Add people from a Kith .json file', () => { E.fileImport.value = ''; E.fileImport.click(); }),

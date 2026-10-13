@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kith</title>
+<meta name="apple-mobile-web-app-title" content="Kith">
+<meta name="theme-color" content="#0d1116">
+<link rel="icon" href="../icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<script>
+  // The home-screen door to the live Kith app on claude.ai. The app itself can't set the icon a phone saves
+  // (it runs inside claude.ai), so this page carries the icon and, once saved, simply opens the app.
+  // Opened with ?add it stays put and shows how to save it, after dropping ?add so the saved icon opens the app.
+  var APP = 'https://claude.ai/artifact/H9b3EVFHtbr1E5BkgF32oW';
+  var adding = /[?&#]add\b/.test(location.search + location.hash);
+  document.documentElement.className = adding ? 'adding' : 'going';
+  if (adding) history.replaceState(null, '', location.pathname);
+  else location.replace(APP);
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Figtree:wght@400..800&display=swap">
+<style>
+  :root { color-scheme: dark; --bg: #0d1116; --surface: #161c23; --line: #262e39; --ink: #eef2f6; --ink-2: #c3cbd4; --muted: #8b96a4; --hl: #ffd43b; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--ink); }
+  body { font: 16px/1.5 "Figtree", ui-sans-serif, system-ui, -apple-system, sans-serif; -webkit-font-smoothing: antialiased; }
+  main { min-height: 100vh; min-height: 100dvh; display: grid; place-items: center; padding: max(32px, env(safe-area-inset-top)) 20px max(32px, env(safe-area-inset-bottom)); }
+  .card { width: 100%; max-width: 400px; display: grid; justify-items: center; gap: 22px; text-align: center; }
+  .tile { width: 96px; height: 96px; border-radius: 22px; display: block; box-shadow: inset 0 0 0 1px rgba(255,255,255,.07), 0 18px 40px rgba(0,0,0,.5); }
+  h1 { margin: 0; font: 800 30px/1.08 "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif; letter-spacing: -0.035em; text-wrap: balance; }
+  p { margin: 0; color: var(--ink-2); }
+  ol { list-style: none; margin: 0; padding: 0; width: 100%; display: grid; gap: 8px; text-align: left; }
+  li { display: grid; grid-template-columns: 28px 1fr; gap: 12px; align-items: center; padding: 13px 14px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); font-weight: 600; }
+  li b { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--hl); color: #2a2000; font: 800 14px/1 "Figtree", sans-serif; }
+  li svg { width: 20px; height: 20px; vertical-align: -4px; margin: 0 2px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+  .open { display: inline-flex; align-items: center; justify-content: center; height: 48px; padding: 0 22px; border-radius: 14px; background: var(--ink); color: var(--bg); font-weight: 700; text-decoration: none; }
+  .note { font-size: 14px; color: var(--muted); max-width: 34ch; }
+  .steps { display: grid; gap: 22px; justify-items: center; width: 100%; }
+  .going .adding-only, .adding .going-only { display: none; }
+  .going-only { color: var(--muted); font-size: 14px; }
+  .going-only a { color: var(--ink); }
+  .android { display: none; }
+  .is-android .android { display: grid; }
+  .is-android .ios { display: none; }
+</style>
+</head>
+<body>
+<main>
+  <div class="card">
+    <img class="tile" src="../icons/icon-192.png" alt="Kith">
+    <p class="going-only">Opening Kith… <a href="https://claude.ai/artifact/H9b3EVFHtbr1E5BkgF32oW">Tap here if nothing happens.</a></p>
+    <div class="adding-only steps">
+      <h1>Put Kith on your Home Screen</h1>
+      <ol class="ios">
+        <li><b>1</b><span>Tap Share <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M8.5 10H6.5A1.5 1.5 0 0 0 5 11.5v8A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5v-8a1.5 1.5 0 0 0-1.5-1.5h-2"/></svg> in Safari</span></li>
+        <li><b>2</b><span>Choose <em>Add to Home Screen</em> (scroll down if you don’t see it)</span></li>
+        <li><b>3</b><span>Tap <em>Add</em></span></li>
+      </ol>
+      <ol class="android">
+        <li><b>1</b><span>Tap the menu <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="12" cy="19" r="1.2"/></svg> in Chrome</span></li>
+        <li><b>2</b><span>Choose <em>Add to Home screen</em></span></li>
+        <li><b>3</b><span>Tap <em>Add</em></span></li>
+      </ol>
+      <p class="note">The icon opens your live Kith map, so it’s always the latest version with all your people.</p>
+      <a class="open" href="https://claude.ai/artifact/H9b3EVFHtbr1E5BkgF32oW">Open Kith now</a>
+    </div>
+  </div>
+</main>
+<script>
+  if (/android/i.test(navigator.userAgent)) document.documentElement.classList.add('is-android');
+</script>
+</body>
+</html>

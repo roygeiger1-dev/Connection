@@ -1,14 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <style>
-    .bg{fill:#ffffff}.ink{stroke:#131920}.fr{stroke:#0e9a87}.fa{stroke:#d97706}.sf{fill:#ffffff}
-    @media (prefers-color-scheme: dark){.bg{fill:#161c23}.ink{stroke:#eef2f6}.fr{stroke:#14b8a0}.fa{stroke:#f59e0b}.sf{fill:#161c23}}
-  </style>
-  <rect class="bg" width="512" height="512"/>
+  <rect width="512" height="512" fill="#161c23"/>
   <g transform="translate(51.2 51.2) scale(4.096)" fill="none" stroke-linecap="round">
-    <path class="fr" d="M31 56C44 52 55 42 63 28" stroke-width="9"/>
-    <path class="fa" d="M31 56C45 58 57 64 66 77" stroke-width="9"/>
-    <path class="ink" d="M29 18V82" stroke-width="13"/>
-    <circle class="ink" cx="65" cy="26" r="11" fill="#ffd43b" stroke-width="5.5"/>
-    <circle class="ink sf" cx="66" cy="77" r="9" stroke-width="5.5"/>
+    <path d="M31 56C44 52 55 42 63 28" stroke="#14b8a0" stroke-width="9"/>
+    <path d="M31 56C45 58 57 64 66 77" stroke="#f59e0b" stroke-width="9"/>
+    <path d="M29 18V82" stroke="#eef2f6" stroke-width="13"/>
+    <circle cx="65" cy="26" r="11" fill="#ffd43b" stroke="#eef2f6" stroke-width="5.5"/>
+    <circle cx="66" cy="77" r="9" fill="#161c23" stroke="#eef2f6" stroke-width="5.5"/>
   </g>
 </svg>
