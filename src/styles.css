@@ -738,7 +738,7 @@ select.input { padding-right: 34px; background-image: linear-gradient(45deg, tra
   white-space: nowrap;
   transition: background 0.15s, transform 0.12s, border-color 0.15s;
 }
-a.btn, a.row-btn { text-decoration: none; }
+a.btn { text-decoration: none; }
 .btn:hover { background: var(--surface-2); }
 .btn:active { transform: scale(0.98); }
 .btn.primary { background: var(--ink); border-color: var(--ink); color: var(--bg); }
