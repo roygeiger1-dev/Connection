@@ -25,6 +25,7 @@
     </div>
     <div class="tools glass">
       <button id="btn-search" class="icon-btn" type="button" aria-label="Find a person" title="Find a person (Ctrl K)"></button>
+      <button id="btn-touch" class="icon-btn" type="button" aria-label="Keep in touch" title="Keep in touch"><span id="touch-badge" class="count" hidden></span></button>
       <button id="btn-add" class="icon-btn" type="button" aria-label="Add a person" title="Add a person"></button>
       <button id="btn-menu" class="icon-btn" type="button" aria-label="Menu" title="Menu"></button>
     </div>
@@ -40,9 +41,10 @@
 
   <section id="empty" class="empty" hidden>
     <h1>Who do you know?</h1>
-    <p>Tell Kith about someone — type it, paste it, or say it. It picks out names, companies, places and how everyone is connected.</p>
+    <p>Tell Kith about someone — type it, paste it, or say it. It picks out names, companies, places and how everyone is connected. Or bring in your contacts.</p>
     <div class="row">
       <button id="btn-example" class="btn sm" type="button">Show an example map</button>
+      <button id="btn-import-empty" class="btn sm" type="button">Import contacts</button>
       <button id="btn-first" class="btn sm primary" type="button">Add a person</button>
     </div>
   </section>
@@ -97,4 +99,5 @@
   <input id="file-image" type="file" accept="image/*" hidden>
   <input id="file-photo" type="file" accept="image/*" hidden>
   <input id="file-import" type="file" accept=".json,application/json" hidden>
+  <input id="file-contacts" type="file" accept=".vcf,.vcard,.csv,text/vcard,text/x-vcard,text/csv,text/comma-separated-values" hidden>
 </div>

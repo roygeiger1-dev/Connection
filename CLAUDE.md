@@ -22,4 +22,6 @@ Kith is a private relationship map (people, free-placement drag-to-connect threa
 - Claude: `initAI`, `parsePrompt` + `normalizeDraft` (notes → reviewable draft), `ASK_RULES` + `runAsk` (questions).
 - Fallbacks without Claude: `parseLocal` (rule-based note reader), `answerLocal`.
 - Map: `renderNodes`, `renderEdges`, `layoutLabels`, `applyFocus`, pointer handlers `onDown/onMove/onUp`, `tidy`.
-- Panels: `VIEWS.*` (person, rel, relEdit, personEdit, pick, search, review, ask, menu).
+- Keep in touch: `dueInfo`, `birthdayInfo`, `logTouch`, `setCadence`, `touchSection`; person fields `cadence` (days), `cadenceFrom`, `lastContact` (YYYY-MM-DD), `log` ([{d, note}], newest first), `birthday` ("YYYY-MM-DD" or "--MM-DD"), `link`.
+- Contact import: `parseVCards`, `parseCSV` + `csvToContacts` (Google, Outlook, LinkedIn headers), `applyImport` (new people in a grid beside the map; existing people only get empty fields filled).
+- Panels: `VIEWS.*` (person, rel, relEdit, personEdit, pick, search, review, ask, menu, touch, logTouch, importHelp, importReview).

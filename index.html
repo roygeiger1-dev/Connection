@@ -49,6 +49,8 @@
   --c-other: #7d8b9c;
   --danger: #cf3434;
   --ok: #18915a;
+  --due: #e8590c;
+  --due-soft: rgba(232, 89, 12, 0.1);
   --av-s: 44%;
   --av-l: 87%;
   --av-ts: 40%;
@@ -85,6 +87,8 @@
     --c-other: #95a3b5;
     --danger: #ff6b6b;
     --ok: #3ccf8a;
+    --due: #ff8a4c;
+    --due-soft: rgba(255, 138, 76, 0.12);
     --av-s: 28%;
     --av-l: 25%;
     --av-ts: 62%;
@@ -118,6 +122,8 @@
   --c-other: #95a3b5;
   --danger: #ff6b6b;
   --ok: #3ccf8a;
+  --due: #ff8a4c;
+  --due-soft: rgba(255, 138, 76, 0.12);
   --av-s: 28%;
   --av-l: 25%;
   --av-ts: 62%;
@@ -269,6 +275,9 @@ svg.i { width: var(--s, 20px); height: var(--s, 20px); flex: none; fill: none; s
 }
 .node .knob::before { content: ""; position: absolute; inset: -10px; border-radius: 50%; }
 .node.me .knob { left: 18px; top: 18px; }
+.node .due { position: absolute; left: 14px; top: -29px; width: 15px; height: 15px; border-radius: 50%; background: var(--due); border: 2.5px solid var(--surface); pointer-events: none; }
+.node .due.bday { background: var(--c-romantic); }
+.node .due.due::after { content: ""; position: absolute; inset: -5px; border-radius: 50%; border: 2px solid var(--due); opacity: 0.5; animation: ring 2.4s var(--ease) infinite; }
 .node.sel .knob { opacity: 1; transform: scale(1); pointer-events: auto; }
 @media (hover: hover) {
   .node:not(.dim):hover .knob { opacity: 1; transform: scale(1); pointer-events: auto; }
@@ -333,6 +342,8 @@ svg.i { width: var(--s, 20px); height: var(--s, 20px); flex: none; fill: none; s
   transition: background 0.15s;
 }
 .icon-btn:hover { background: var(--surface-2); }
+.tools .icon-btn { position: relative; }
+.count { position: absolute; top: 2px; right: 1px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--due); color: #fff; border: 2px solid var(--surface); font: 700 10.5px/14px var(--f-body); font-variant-numeric: tabular-nums; text-align: center; pointer-events: none; }
 .icon-btn:active { transform: scale(0.96); }
 
 .filters {
@@ -896,6 +907,51 @@ select.input { padding-right: 34px; background-image: linear-gradient(45deg, tra
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
 }
+
+/* ---------- keep in touch ---------- */
+.meta .soon { color: var(--c-romantic); font-weight: 600; }
+.touch-card { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: start; padding: 13px 14px; border-radius: 16px; background: var(--surface-2); border: 1px solid var(--line); margin-bottom: 10px; font-size: 14px; line-height: 1.45; color: var(--ink-2); }
+.touch-card > svg { color: var(--muted); margin-top: 1px; }
+.touch-card b { display: block; color: var(--ink); font: 700 15px/1.3 var(--f-display); margin-bottom: 1px; }
+.touch-card.soon { border-color: var(--line-2); }
+.touch-card.late { background: var(--due-soft); border-color: var(--due); }
+.touch-card.late > svg { color: var(--due); }
+.log { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; border-left: 2px solid var(--line); margin-left: 6px; }
+.log li { position: relative; display: grid; grid-template-columns: 74px 1fr; gap: 10px; padding: 6px 0 6px 16px; font-size: 14px; line-height: 1.45; color: var(--ink-2); }
+.log li::before { content: ""; position: absolute; left: -6px; top: 12px; width: 10px; height: 10px; border-radius: 50%; background: var(--surface); border: 2px solid var(--line-2); }
+.log li:first-child::before { border-color: var(--ink); }
+.log .when { font: 500 11.5px/1.9 var(--f-mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+.touch-list { display: grid; gap: 2px; margin: 0 -10px; }
+.touch-row { display: flex; align-items: center; gap: 8px; padding-right: 10px; border-radius: 14px; }
+.touch-row:hover { background: var(--surface-2); }
+.touch-main { flex: 1; min-width: 0; display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: center; padding: 9px 10px; border: 0; background: none; color: inherit; text-align: left; border-radius: 14px; }
+.touch-main > div { min-width: 0; }
+.touch-main .t { font: 650 15px/1.3 var(--f-body); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.touch-main .d { font-size: 13px; color: var(--muted); line-height: 1.35; margin-top: 1px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.touch-row .btn { flex: none; }
+.mini-select { flex: none; width: 128px; }
+.mini-select .input { height: 36px; font-size: 13.5px; border-radius: 11px; padding: 0 28px 0 10px; background-position: calc(100% - 15px) 16px, calc(100% - 10px) 16px; }
+
+/* ---------- contact import ---------- */
+.howto { border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+.howto + .howto { margin-top: -6px; }
+.howto summary { list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 14px; font: 650 14.5px/1.2 var(--f-body); cursor: pointer; }
+.howto summary::-webkit-details-marker { display: none; }
+.howto summary svg { color: var(--muted); transition: transform 0.2s; }
+.howto[open] summary svg { transform: rotate(90deg); }
+.howto ol { margin: 0; padding: 0 16px 14px 34px; display: grid; gap: 6px; font-size: 14px; line-height: 1.5; color: var(--ink-2); }
+.imp-bar { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+.imp-count { margin-left: auto; font: 500 11.5px/1 var(--f-mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+.imp-list { display: grid; gap: 2px; margin: 0 -10px; }
+.imp-row { display: grid; grid-template-columns: auto auto 1fr; gap: 12px; align-items: center; width: 100%; padding: 8px 10px; border: 0; border-radius: 14px; background: transparent; color: inherit; text-align: left; }
+.imp-row:hover { background: var(--surface-2); }
+.imp-row > div { min-width: 0; }
+.imp-row .toggle { pointer-events: none; }
+.imp-row.on .toggle { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+.imp-row .t { font: 650 14.5px/1.3 var(--f-body); display: flex; align-items: center; gap: 8px; min-width: 0; }
+.imp-row .t .badge { height: 19px; font-size: 9.5px; }
+.imp-row .d { font-size: 13px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.imp-row .miniav { width: 38px; height: 38px; font-size: 13px; }
 </style>
 </head>
 <body>
@@ -926,6 +982,7 @@ select.input { padding-right: 34px; background-image: linear-gradient(45deg, tra
     </div>
     <div class="tools glass">
       <button id="btn-search" class="icon-btn" type="button" aria-label="Find a person" title="Find a person (Ctrl K)"></button>
+      <button id="btn-touch" class="icon-btn" type="button" aria-label="Keep in touch" title="Keep in touch"><span id="touch-badge" class="count" hidden></span></button>
       <button id="btn-add" class="icon-btn" type="button" aria-label="Add a person" title="Add a person"></button>
       <button id="btn-menu" class="icon-btn" type="button" aria-label="Menu" title="Menu"></button>
     </div>
@@ -941,9 +998,10 @@ select.input { padding-right: 34px; background-image: linear-gradient(45deg, tra
 
   <section id="empty" class="empty" hidden>
     <h1>Who do you know?</h1>
-    <p>Tell Kith about someone — type it, paste it, or say it. It picks out names, companies, places and how everyone is connected.</p>
+    <p>Tell Kith about someone — type it, paste it, or say it. It picks out names, companies, places and how everyone is connected. Or bring in your contacts.</p>
     <div class="row">
       <button id="btn-example" class="btn sm" type="button">Show an example map</button>
+      <button id="btn-import-empty" class="btn sm" type="button">Import contacts</button>
       <button id="btn-first" class="btn sm primary" type="button">Add a person</button>
     </div>
   </section>
@@ -998,6 +1056,7 @@ select.input { padding-right: 34px; background-image: linear-gradient(45deg, tra
   <input id="file-image" type="file" accept="image/*" hidden>
   <input id="file-photo" type="file" accept="image/*" hidden>
   <input id="file-import" type="file" accept=".json,application/json" hidden>
+  <input id="file-contacts" type="file" accept=".vcf,.vcard,.csv,text/vcard,text/x-vcard,text/csv,text/comma-separated-values" hidden>
 </div>
 <script>
 (() => {
@@ -1090,6 +1149,10 @@ select.input { padding-right: 34px; background-image: linear-gradient(45deg, tra
     note: '<path d="M6 3.5h9l3.5 3.5v13.5H6Z"/><path d="M9 11h6.5M9 14.5h6.5M9 18h4"/>',
     erase: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
     loader: '<path d="M12 3a9 9 0 1 0 9 9" />',
+    bell: '<path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2H4.5Z"/><path d="M10 21h4"/>',
+    clock: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+    cake: '<path d="M4 20h16M5 20v-7a1.5 1.5 0 0 1 1.5-1.5h11A1.5 1.5 0 0 1 19 13v7"/><path d="M5 15.5c1.2 1 2.3 1 3.5 0s2.3-1 3.5 0 2.3 1 3.5 0 2.3-1 3.5 0M12 11.5V8M12 5.5v.1"/>',
+    contacts: '<rect x="5" y="3" width="15" height="18" rx="2.5"/><circle cx="12.5" cy="10" r="2.6"/><path d="M8.5 16.5a4 4 0 0 1 8 0M3 7.5h3M3 12h3M3 16.5h3"/>',
     ask: '<path d="M20.5 12a8.5 8.5 0 0 1-12.4 7.6L3.5 20.5l1-4.3A8.5 8.5 0 1 1 20.5 12Z"/><path d="M9.8 9.6a2.3 2.3 0 0 1 4.5.6c0 1.6-2.3 2-2.3 3.4"/><circle cx="12" cy="16.6" r=".9" fill="currentColor" stroke="none"/>',
   };
   function icon(name, size) {
@@ -1530,6 +1593,12 @@ select.input { padding-right: 34px; background-image: linear-gradient(45deg, tra
       if (p.details) bits.push('notes: ' + p.details.replace(/\s+/g, ' ').slice(0, maxNotes));
       if (p.email) bits.push('email ' + p.email);
       if (p.phone) bits.push('phone ' + p.phone);
+      if (p.birthday) bits.push('birthday ' + birthdayText(p.birthday));
+      if (p.lastContact) bits.push(`last caught up ${p.lastContact} (${relDays(dayNum(p.lastContact) - todayNum())})`);
+      const di = dueInfo(p);
+      if (di) bits.push(`wants to keep in touch ${cadenceLabel(di.cadence).toLowerCase()}; next catch-up ${di.left < 0 ? 'overdue by ' + -di.left + ' days' : di.left === 0 ? 'due today' : 'due in ' + di.left + ' days'}`);
+      const recent = (p.log || []).filter((e) => e.note).slice(0, 3).map((e) => `${e.d}: ${e.note.replace(/\s+/g, ' ').slice(0, 200)}`);
+      if (recent.length) bits.push('recent catch-ups: ' + recent.join(' | '));
       lines.push(`- ${p.name || 'Unnamed'} [${p.id}]${bits.length ? ': ' + bits.join('; ') : ''}`);
     }
     lines.push('', 'Relationships (each reads "A is B’s type"):');
@@ -1561,7 +1630,7 @@ select.input { padding-right: 34px; background-image: linear-gradient(45deg, tra
       '"""',
       withImage ? '\nThe attached image is part of the note — for example a screenshot of a profile, contact card, email signature, chat or org chart. Read the people and facts in it.\n' : '',
       'Reply with only JSON in this shape:',
-      '{"people":[{"ref":"existing ref, or new1, new2…","name":"Full Name","title":"","company":"","location":"","traits":[],"details":"","email":"","phone":""}],',
+      '{"people":[{"ref":"existing ref, or new1, new2…","name":"Full Name","title":"","company":"","location":"","traits":[],"details":"","email":"","phone":"","birthday":"","lastContact":"","touchNote":"","cadenceDays":0}],',
       ' "relationships":[{"from":"ref","to":"ref","type":"sister","category":"family","strength":2,"description":""}]}',
       '',
       'Rules:',
@@ -1574,6 +1643,9 @@ select.input { padding-right: 34px; background-image: linear-gradient(45deg, tra
       '- category: family, friend, work, romantic, mentor or other.',
       '- strength: 1 distant, 2 casual, 3 close, 4 very close. Use 2 unless the note suggests otherwise.',
       '- description: what the note says about how the two know each other, in the note’s own terms; "" if nothing.',
+      `- Today is ${todayStr()}. birthday: "YYYY-MM-DD", or "--MM-DD" when the year isn’t given; "" if not mentioned.`,
+      '- lastContact: the date (YYYY-MM-DD) the author last met, called or messaged this person, when the note says so ("had coffee with Sarah today", "called Mike yesterday"); otherwise "". touchNote: one short line on what they talked about, when lastContact is set.',
+      '- cadenceDays: only when the note asks to keep in touch at an interval ("check in with Dan every month" → 30); otherwise 0.',
       '- Never invent facts. If the note mentions no people, reply {"people":[],"relationships":[]}.',
     ].join('\n');
   }
@@ -1613,7 +1685,9 @@ select.input { padding-right: 34px; background-image: linear-gradient(45deg, tra
     'in at on from for with to of by about via into onto mr mrs ms dr prof sir hi hey hello dear note notes trait traits company location email phone title role details ' +
     'monday tuesday wednesday thursday friday saturday sunday january february march april june july august september october november december ' +
     'is are was were be been am will would should could can cannot not yes no ok okay please thanks thank new old great good nice very really super both all every each some any ' +
-    'mom dad mum grandma grandpa auntie uncle sis bro').split(/\s+/));
+    'mom dad mum grandma grandpa auntie uncle sis bro ' +
+    'remind remember ask tell check text message ping follow schedule book send invite introduce intro thank congratulate wish buy get find add having grabbed caught catch keep stay reach touch let make need want try ' +
+    'series seed round raising raised pre').split(/\s+/));
   const ORG_WORDS = new Set('university college school inc llc ltd corp corporation company group labs lab capital ventures partners bank hospital institute foundation sales marketing engineering operations legal finance demo conference summit airport church club gym cafe restaurant hotel studio studios agency systems technologies holdings media health medical team board committee'.split(' '));
   const PARTICLES = new Set(['de', 'da', 'del', 'della', 'di', 'van', 'von', 'der', 'den', 'la', 'le', 'du', 'bin', 'al', 'ibn', 'dos', 'das', 'st']);
   const REL_STOP = new Set(['and', 'but', 'who', 'whom', 'which', 'that', 'at', 'in', 'since', 'because', 'is', 'was', 'were', 'are', 'works', 'work', 'worked', 'lives', 'lived', 'living', 'based', 'currently', 'now', 'also', 'too', 'as', 'for', 'with', 'when', 'where', 'while', 'so', 'though', 'although', 'she', 'he', 'they', 'her', 'his', 'their', 'to', 'on', 'by', 'about', 'after', 'before', 'from', 'through', 'via', 'we', 'i', 'you', 'it', 'has', 'have', 'had', 'loves', 'likes', 'runs', 'whose', 'still', 'again', 'there', 'here', 'then', 'very', 'really', 'if', 'or', 'met', 'introduced', 'knows', 'know']);
@@ -1712,7 +1786,7 @@ select.input { padding-right: 34px; background-image: linear-gradient(45deg, tra
     const byKey = new Map();
     let meEntry = null;
     let last = null;
-    const blank = (ref, existingId, name) => ({ ref, existingId, name, title: '', company: '', location: '', traits: [], details: '', email: '', phone: '', include: true, uses: 0, dead: false });
+    const blank = (ref, existingId, name) => ({ ref, existingId, name, title: '', company: '', location: '', traits: [], details: '', email: '', phone: '', birthday: '', lastContact: '', touchNote: '', cadenceDays: 0, include: true, uses: 0, dead: false });
     const me = () => meEntry || (meEntry = Object.assign(blank(ME, ME, ''), { me: true }));
     const knownPlaces = new Set(others().flatMap((p) => [norm(p.company), norm(p.location)]).filter(Boolean));
 
@@ -2007,7 +2081,21 @@ select.input { padding-right: 34px; background-image: linear-gradient(45deg, tra
       const ph = sentence.match(/\+?\d[\d\s().-]{7,}\d/);
       const holder = subject || last;
       if (holder && em) { holder.email = em[0]; facts++; }
-      if (holder && ph && !/^\d{4}$/.test(ph[0])) { holder.phone = ph[0].trim(); facts++; }
+      if (holder && ph && !/^\d{4}$/.test(ph[0]) && !/^\d{4}-\d{2}-\d{2}$/.test(ph[0].trim())) { holder.phone = ph[0].trim(); facts++; }
+      const inSentence = ents.filter((P, i) => P && P !== meEntry && t.includes('@' + i));
+      const bm = /\b(?:birthday|bday|b-day|born)\b(?:\s+is|\s+was|\s+on|:)?\s+(?:on\s+)?([A-Za-z]{3,9}\.?\s+\d{1,2}(?:st|nd|rd|th)?(?:,?\s+\d{4})?|\d{1,2}(?:st|nd|rd|th)?\s+(?:of\s+)?[A-Za-z]{3,9}(?:,?\s+\d{4})?|\d{4}-\d{2}-\d{2}|\d{1,2}[/.]\d{1,2}(?:[/.]\d{2,4})?)/i.exec(sentence);
+      if (bm && holder && holder !== meEntry) { const b = parseBirthday(bm[1]); if (b) { holder.birthday = b; facts++; } }
+      const tm = /\b(today|this morning|this afternoon|tonight|yesterday|last night)\b/i.exec(sentence);
+      if (tm && /\b(met|meet|saw|see|talked|talk|spoke|speak|called|call|had (?:coffee|lunch|dinner|drinks|breakfast|a call|a chat|a meeting)|caught up|catch up|ran into|texted|chatted|visited|hung out|facetimed|grabbed)\b/i.test(sentence)) {
+        const when = /yesterday|last night/i.test(tm[1]) ? fromDayNum(todayNum() - 1) : todayStr();
+        for (const P of inSentence.length ? inSentence : holder && holder !== meEntry ? [holder] : []) { P.lastContact = when; P.touchNote = sentence.replace(/\s+/g, ' ').trim(); P.uses++; facts++; }
+      }
+      const cm = /\b(?:keep in touch|stay in touch|catch up|check in|reach out|touch base|remind me)\b[^.]*?\bevery\s+(day|week|other week|two weeks|2 weeks|couple of weeks|month|other month|couple of months|few months|2 months|two months|3 months|three months|quarter|6 months|six months|half year|year)\b/i.exec(sentence);
+      if (cm) {
+        const w = cm[1].toLowerCase();
+        const days = /day|^week/.test(w) ? 7 : /other week|two weeks|2 weeks|couple of weeks/.test(w) ? 14 : /^month/.test(w) ? 30 : /other month|couple of months|2 months|two months/.test(w) ? 60 : /few months|3 months|three months|quarter/.test(w) ? 90 : /6 months|six months|half/.test(w) ? 180 : 365;
+        for (const P of inSentence.length ? inSentence : holder && holder !== meEntry ? [holder] : []) { P.cadenceDays = nearestCadence(days); P.uses++; facts++; }
+      }
 
       // anything we couldn't structure goes into notes on the person it's about
       if (!facts) {
@@ -2024,7 +2112,7 @@ select.input { padding-right: 34px; background-image: linear-gradient(45deg, tra
 
     // people the note only mentioned in passing as a company or place are dropped
     for (const e of entries) {
-      const hasFacts = e.title || e.company || e.location || e.traits.length || e.details || e.email || e.phone;
+      const hasFacts = e.title || e.company || e.location || e.traits.length || e.details || e.email || e.phone || e.birthday || e.lastContact || e.cadenceDays;
       const inRel = d.rels.some((r) => r.from === e.ref || r.to === e.ref);
       if (e.existingId && !hasFacts) continue;
       if (!hasFacts && !inRel && (e.dead || !e.name.includes(' ') || knownPlaces.has(norm(e.name)))) continue;
@@ -2067,6 +2155,10 @@ select.input { padding-right: 34px; background-image: linear-gradient(45deg, tra
         details: str(x.details),
         email: str(x.email),
         phone: str(x.phone),
+        birthday: parseBirthday(x.birthday) || (/^--\d{2}-\d{2}$/.test(str(x.birthday)) ? str(x.birthday) : ''),
+        lastContact: dayNum(str(x.lastContact)) != null && str(x.lastContact).slice(0, 10) <= todayStr() ? str(x.lastContact).slice(0, 10) : '',
+        touchNote: str(x.touchNote),
+        cadenceDays: nearestCadence(x.cadenceDays),
         include: true,
       };
       if (existing === ME && name) entry.myName = name;
@@ -2091,7 +2183,7 @@ select.input { padding-right: 34px; background-image: linear-gradient(45deg, tra
       const category = CAT_KEYS.includes(r.category) ? r.category : inferCat(type);
       d.rels.push({ from: a, to: b, type, category, strength: clamp(Math.round(Number(r.strength) || 2), 1, 4), description: str(r.description), include: true });
     }
-    const hasFacts = (p) => p.title || p.company || p.location || p.traits.length || p.details || p.email || p.phone || p.newName || p.myName;
+    const hasFacts = (p) => p.title || p.company || p.location || p.traits.length || p.details || p.email || p.phone || p.newName || p.myName || p.birthday || p.lastContact || p.cadenceDays;
     d.people = d.people.filter((p) => !p.existingId || hasFacts(p));
     return d;
   }
@@ -2139,6 +2231,9 @@ select.input { padding-right: 34px; background-image: linear-gradient(45deg, tra
     }
     if (p.traits && p.traits.length) lines.push(`Traits: ${p.traits.join(', ')}.`);
     if (p.details) lines.push(`Notes: ${p.details}`);
+    const tl = touchLine(p);
+    if (tl) lines.push(`Keep in touch: ${tl}.`);
+    if (p.birthday) lines.push(`Birthday: ${fmtBirthday(p.birthday)}.`);
     const rest = relsOf(id).filter((r) => r.a !== ME && r.b !== ME);
     if (rest.length) {
       lines.push('', 'Their connections:');
@@ -2183,6 +2278,18 @@ select.input { padding-right: 34px; background-image: linear-gradient(45deg, tra
     if (ids.length === 1) {
       if (meToo && /\b(how|connected|link|linked|know|relationship|relate|related|met)\b/.test(ql)) return describePair(ids[0], ME) + '\n\n' + describePerson(ids[0]).split('\n').slice(0, 1).join('');
       return describePerson(ids[0]);
+    }
+    if (/\b(catch up|catch-up|overdue|reach out|keep in touch|lost touch|haven.?t (talked|spoken|seen|called)|due|follow up|neglect)/.test(ql)) {
+      const rows = ps.map((p) => ({ p, i: dueInfo(p) })).filter((r) => r.i).sort((a, b) => a.i.left - b.i.left);
+      if (!rows.length) return 'You haven’t set any keep-in-touch reminders yet. Open a person and choose how often you want to catch up.';
+      const now2 = rows.filter((r) => r.i.left <= 7);
+      const list = now2.length ? now2 : rows.slice(0, 5);
+      return [now2.length ? 'Time to catch up:' : 'No one is due this week. Coming up next:', ...list.map((r) => `- ${bold(r.p.id)} — ${touchLine(r.p)}`)].join('\n');
+    }
+    if (/\bbirthdays?\b/.test(ql)) {
+      const rows = ps.map((p) => ({ p, b: birthdayInfo(p) })).filter((r) => r.b).sort((a, b) => a.b.days - b.b.days);
+      if (!rows.length) return 'No birthdays saved yet. Add them in a person’s Edit form, or import contacts that have them.';
+      return ['Upcoming birthdays:', ...rows.slice(0, 8).map((r) => `- ${bold(r.p.id)} — ${r.b.label.replace(/, \d{4}$/, '')}, ${r.b.days === 0 ? 'today' : relDays(r.b.days)}${r.b.age ? ` (turns ${r.b.age})` : ''}`)].join('\n');
     }
     // a specific relationship type: "who are my cousins", "investors"
     const types = [...new Set(relList().map((r) => norm(r.type)).filter(Boolean))].sort((a, b) => b.length - a.length);
@@ -2263,7 +2370,9 @@ select.input { padding-right: 34px; background-image: linear-gradient(45deg, tra
     const label = isMe ? 'You' : p.name || 'Unnamed';
     const knob = h('button', { class: 'knob', type: 'button', 'data-id': p.id, tabindex: '-1', 'aria-label': `Connect ${isMe ? 'yourself' : label} to someone`, title: 'Drag onto someone to connect' }, icon('link', 14));
     const sub = isMe ? p.name || '' : p.company || p.title || p.location || '';
-    el.replaceChildren(av, knob, h('div', { class: 'nm' }, label), sub ? h('div', { class: 'sub' }, sub) : '');
+    const ds = dueState(p);
+    const badge = ds ? h('span', { class: 'due ' + ds, title: ds === 'due' ? 'Time to catch up' : 'Birthday coming up' }) : '';
+    el.replaceChildren(av, knob, badge, h('div', { class: 'nm' }, label), sub ? h('div', { class: 'sub' }, sub) : '');
     el.setAttribute('aria-label', isMe ? 'You' : label);
   }
   function renderNodes() {
@@ -2281,7 +2390,7 @@ select.input { padding-right: 34px; background-image: linear-gradient(45deg, tra
         E.nodes.append(el);
         el._sig = null;
       }
-      const sig = [p.name, p.company, p.title, p.location, p.photo ? p.photo.length + p.photo.slice(-24) : ''].join('|');
+      const sig = [p.name, p.company, p.title, p.location, p.photo ? p.photo.length + p.photo.slice(-24) : '', dueState(p)].join('|');
       if (el._sig !== sig) { el._sig = sig; fillNode(el, p); }
       el.style.transform = nodeTf(pos(p.id));
     }
@@ -2456,6 +2565,7 @@ select.input { padding-right: 34px; background-image: linear-gradient(45deg, tra
     E.stats.textContent = `${plural(n, 'person', 'people')} · ${plural(m, 'connection', 'connections')}`;
     E.empty.hidden = !(S.ready && n === 0);
     syncBadge();
+    renderTouchBadge();
   }
   function render() {
     renderNodes();
@@ -3074,7 +3184,8 @@ select.input { padding-right: 34px; background-image: linear-gradient(45deg, tra
       icon('right'),
     );
   }
-  function VIEW_PERSON({ id }) {
+  function VIEW_PERSON(args) {
+    const { id } = args;
     const p = S.people[id];
     if (!p) return null;
     S.selected = id;
@@ -3083,6 +3194,8 @@ select.input { padding-right: 34px; background-image: linear-gradient(45deg, tra
     const role = roleLine(p);
     const meta = h('div', { class: 'meta' });
     if (p.location) meta.append(h('span', {}, icon('pin'), p.location));
+    const bd = birthdayInfo(p);
+    if (bd) meta.append(h('span', { class: bd.days <= 7 ? 'soon' : '' }, icon('cake'), bd.label.replace(/, \d{4}$/, '') + (bd.days === 0 ? ' · today' : bd.days <= 30 ? ` · ${relDays(bd.days)}` : '')));
     if (isMe) meta.append(h('span', {}, icon('users'), 'This is you'));
     const head = h('div', { class: 'p-head' }, avatar(p, 'bigav'), h('div', { style: 'min-width:0' }, h('h3', { class: 'p-name' }, isMe ? p.name || 'You' : p.name || 'Unnamed'), role ? h('div', { class: 'p-role' }, role) : '', meta.childElementCount ? meta : ''));
     const act = (ic, label, fn) => h('button', { class: 'act', type: 'button', onclick: fn }, icon(ic), label);
@@ -3095,13 +3208,15 @@ select.input { padding-right: 34px; background-image: linear-gradient(45deg, tra
       act('target', 'Center', () => centerOn(id)),
     );
     const body = h('div', {}, head, actions);
+    if (!isMe) body.append(touchSection(p, args));
     if (p.traits && p.traits.length) body.append(h('div', { class: 'eyebrow' }, 'Traits'), h('div', { class: 'traits' }, p.traits.map((t) => h('span', { class: 'trait' }, t))));
     body.append(h('div', { class: 'eyebrow' }, 'Details'));
     body.append(p.details ? h('p', { class: 'prose' }, p.details) : h('p', { class: 'muted-note' }, isMe ? 'Add your name and anything else you want Kith to know about you.' : `Nothing written about ${first} yet. Tap Edit, or type a note in the Add box.`));
-    if (p.email || p.phone) {
+    if (p.email || p.phone || p.link) {
       const rows = [];
       if (p.email) rows.push(contactRow('mail', p.email));
       if (p.phone) rows.push(contactRow('phone', p.phone));
+      if (p.link && /^https?:\/\//i.test(p.link)) rows.push(h('div', { class: 'contact-row' }, icon('link', 18), h('a', { href: p.link, target: '_blank', rel: 'noopener noreferrer' }, p.link.replace(/^https?:\/\/(www\.)?/i, '').replace(/\/$/, '')), h('button', { class: 'icon-btn', type: 'button', 'aria-label': 'Copy link', onclick: (e) => copyText(p.link, e.currentTarget) }, icon('copy', 17))));
       body.append(h('div', { class: 'eyebrow' }, 'Contact'), h('div', { class: 'contact' }, rows));
     }
     const rels = relsOf(id).sort((a, b) => (otherEnd(a, id) === ME ? -1 : 0) - (otherEnd(b, id) === ME ? -1 : 0) || (b.strength || 2) - (a.strength || 2));
@@ -3129,6 +3244,675 @@ select.input { padding-right: 34px; background-image: linear-gradient(45deg, tra
         toast('Selected — copy it from the menu');
       }
     }
+  }
+
+  /* =====================================================================
+     Keep in touch: dates, catch-up cadences, birthdays
+     ===================================================================== */
+  const DAY = 86400000;
+  const CADENCES = [[0, 'Off', 'Off'], [7, 'Every week', 'Weekly'], [14, 'Every 2 weeks', '2 weeks'], [30, 'Every month', 'Monthly'], [90, 'Every 3 months', '3 months'], [180, 'Every 6 months', '6 months'], [365, 'Every year', 'Yearly']];
+  const MONTHS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+  const pad2 = (n) => String(n).padStart(2, '0');
+  const ymd = (d = new Date()) => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+  const todayStr = () => ymd();
+  function dayNum(s) {
+    const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(s || '');
+    return m ? Math.round(Date.UTC(+m[1], +m[2] - 1, +m[3]) / DAY) : null;
+  }
+  const todayNum = () => dayNum(todayStr());
+  function fromDayNum(n) {
+    const d = new Date(n * DAY);
+    return `${d.getUTCFullYear()}-${pad2(d.getUTCMonth() + 1)}-${pad2(d.getUTCDate())}`;
+  }
+  function fmtDay(s) {
+    const n = dayNum(s);
+    if (n == null) return '';
+    const d = new Date(n * DAY);
+    const opts = { month: 'short', day: 'numeric', timeZone: 'UTC' };
+    if (d.getUTCFullYear() !== new Date().getFullYear()) opts.year = 'numeric';
+    return d.toLocaleDateString(undefined, opts);
+  }
+  // d = target day minus today
+  function relDays(d) {
+    if (d === 0) return 'today';
+    if (d === 1) return 'tomorrow';
+    if (d === -1) return 'yesterday';
+    const a = Math.abs(d);
+    const t = a < 14 ? `${a} days` : a < 60 ? `${Math.round(a / 7)} weeks` : a < 548 ? `${Math.round(a / 30.4)} months` : plural(Math.round(a / 365), 'year', 'years');
+    return d > 0 ? `in ${t}` : `${t} ago`;
+  }
+  const cadenceLabel = (days, short) => {
+    const c = CADENCES.find((x) => x[0] === days);
+    return c ? c[short ? 2 : 1] : `Every ${days} days`;
+  };
+  function nearestCadence(days) {
+    days = Math.round(Number(days) || 0);
+    if (days <= 0) return 0;
+    return CADENCES.slice(1).reduce((best, c) => (Math.abs(c[0] - days) < Math.abs(best - days) ? c[0] : best), 30);
+  }
+  // Birthdays are kept as "YYYY-MM-DD", or "--MM-DD" when the year isn't known.
+  function parseBirthday(s) {
+    s = String(s || '').trim().replace(/T.*$/, '');
+    if (!s) return '';
+    const ok = (y, mo, d) => {
+      if (!(mo >= 1 && mo <= 12 && d >= 1 && d <= 31)) return '';
+      if (y && (y < 1900 || y > new Date().getFullYear())) y = 0;
+      return (y ? String(y) : '-') + '-' + pad2(mo) + '-' + pad2(d);
+    };
+    let m;
+    if ((m = /^(\d{4})-?(\d{2})-?(\d{2})$/.exec(s))) return ok(+m[1], +m[2], +m[3]);
+    if ((m = /^--(\d{2})-?(\d{2})$/.exec(s))) return ok(0, +m[1], +m[2]);
+    if ((m = /^(\d{1,2})[/.-](\d{1,2})(?:[/.-](\d{2,4}))?$/.exec(s))) {
+      let mo = +m[1];
+      let d = +m[2];
+      if (mo > 12) [mo, d] = [d, mo];
+      let y = m[3] ? +m[3] : 0;
+      if (y && y < 100) y += y > (new Date().getFullYear() % 100) ? 1900 : 2000;
+      return ok(y, mo, d);
+    }
+    if ((m = /^([a-z]{3,})\.?\s+(\d{1,2})(?:st|nd|rd|th)?(?:,?\s+(\d{4}))?$/i.exec(s))) {
+      const mo = MONTHS.indexOf(m[1].slice(0, 3).toLowerCase()) + 1;
+      return mo ? ok(m[3] ? +m[3] : 0, mo, +m[2]) : '';
+    }
+    if ((m = /^(\d{1,2})(?:st|nd|rd|th)?\s+(?:of\s+)?([a-z]{3,})\.?(?:,?\s+(\d{4}))?$/i.exec(s))) {
+      const mo = MONTHS.indexOf(m[2].slice(0, 3).toLowerCase()) + 1;
+      return mo ? ok(m[3] ? +m[3] : 0, mo, +m[1]) : '';
+    }
+    return '';
+  }
+  function birthdayText(b) {
+    const m = /^(\d{4}|-)-(\d{2})-(\d{2})$/.exec(b || '');
+    if (!m) return '';
+    const mon = MONTHS[+m[2] - 1];
+    return `${mon[0].toUpperCase() + mon.slice(1)} ${+m[3]}${m[1] === '-' ? '' : ', ' + m[1]}`;
+  }
+  function fmtBirthday(b) {
+    const m = /^(\d{4}|-)-(\d{2})-(\d{2})$/.exec(b || '');
+    if (!m) return '';
+    const d = new Date(Date.UTC(2000, +m[2] - 1, +m[3]));
+    const md = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', timeZone: 'UTC' });
+    return m[1] === '-' ? md : `${md}, ${m[1]}`;
+  }
+  function birthdayInfo(p) {
+    const m = /^(\d{4}|-)-(\d{2})-(\d{2})$/.exec((p && p.birthday) || '');
+    if (!m) return null;
+    const t = todayNum();
+    let y = new Date(t * DAY).getUTCFullYear();
+    const at = (yy) => {
+      let mm = m[2];
+      let dd = m[3];
+      const leap = (yy % 4 === 0 && yy % 100 !== 0) || yy % 400 === 0;
+      if (mm === '02' && dd === '29' && !leap) dd = '28';
+      return dayNum(`${yy}-${mm}-${dd}`);
+    };
+    let next = at(y);
+    if (next < t) next = at(++y);
+    return { days: next - t, date: fromDayNum(next), age: m[1] === '-' ? null : y - +m[1], label: fmtBirthday(p.birthday) };
+  }
+  function dueInfo(p) {
+    const c = Math.round(Number(p && p.cadence) || 0);
+    if (!c || !p || p.id === ME) return null;
+    const base = p.lastContact || p.cadenceFrom || (p.createdAt ? ymd(new Date(p.createdAt)) : todayStr());
+    const due = dayNum(base) + c;
+    return { cadence: c, due, left: due - todayNum(), logged: !!p.lastContact };
+  }
+  function dueState(p) {
+    const i = dueInfo(p);
+    if (i && i.left <= 0) return 'due';
+    const b = birthdayInfo(p);
+    if (b && b.days <= 1) return 'bday';
+    return '';
+  }
+  function remindersNow() {
+    let n = 0;
+    for (const p of others()) {
+      const i = dueInfo(p);
+      const b = birthdayInfo(p);
+      if ((i && i.left <= 0) || (b && b.days === 0)) n++;
+    }
+    return n;
+  }
+  function touchLine(p, short) {
+    const i = dueInfo(p);
+    const last = p.lastContact ? `last talked ${relDays(dayNum(p.lastContact) - todayNum())}` : 'no catch-up logged yet';
+    if (!i) return p.lastContact ? uc1(last) : '';
+    const when = i.left < 0 ? `Overdue by ${relDays(-i.left).replace(/^in /, '')}` : i.left === 0 ? 'Due today' : `Due ${relDays(i.left)}`;
+    return short ? `${when} · ${last}` : `${when} · ${cadenceLabel(i.cadence).toLowerCase()} · ${last}`;
+  }
+  function logTouch(id, date = todayStr(), note = '', { quiet = false } = {}) {
+    const p = S.people[id];
+    if (!p || id === ME) return;
+    const before = clone(p);
+    const log = [{ d: date, note: String(note || '').trim() }, ...(p.log || [])].sort((a, b) => (a.d < b.d ? 1 : a.d > b.d ? -1 : 0)).slice(0, 60);
+    const lastContact = !p.lastContact || date > p.lastContact ? date : p.lastContact;
+    savePerson({ ...p, log, lastContact });
+    onData();
+    if (!quiet) toast(`Logged a catch-up with ${nameOf(id, false)}`, { action: 'Undo', run: () => { savePerson(before); onData(); } });
+  }
+  function setCadence(id, days) {
+    const p = S.people[id];
+    if (!p || id === ME) return;
+    savePerson({ ...p, cadence: days, cadenceFrom: days && !p.lastContact ? p.cadenceFrom || todayStr() : p.cadenceFrom || '' });
+    onData();
+  }
+  function cadencePicker(value, onPick, small) {
+    const box = h('div', { class: 'choice' + (small ? ' small' : '') });
+    const draw = (v) => box.replaceChildren(...CADENCES.map(([d, , short]) => h('button', { type: 'button', 'aria-pressed': String(v === d), onclick: () => { draw(d); onPick(d); } }, short)));
+    draw(value || 0);
+    return box;
+  }
+  function cadenceSelect(value, onPick, id) {
+    const sel = h('select', { class: 'input', id }, CADENCES.map(([d, long]) => h('option', { value: String(d) }, d ? long : "Don't remind me")));
+    sel.value = String(value || 0);
+    sel.addEventListener('change', () => { const v = +sel.value; sel.blur(); onPick(v); });
+    return sel;
+  }
+
+  function touchSection(p, args) {
+    const wrap = h('div', {});
+    const i = dueInfo(p);
+    wrap.append(h('div', { class: 'eyebrow' }, 'Keep in touch', h('button', { class: 'link', type: 'button', onclick: () => openSheet('logTouch', { id: p.id }) }, icon('check', 15), 'Log a catch-up')));
+    const state = !i ? '' : i.left <= 0 ? ' late' : i.left <= 7 ? ' soon' : '';
+    const lines = [];
+    if (i) {
+      lines.push(h('b', {}, i.left < 0 ? `Catch-up overdue by ${relDays(-i.left).replace(/^in /, '')}` : i.left === 0 ? 'Time to catch up today' : `Next catch-up ${relDays(i.left)} · ${fmtDay(fromDayNum(i.due))}`));
+      lines.push(h('span', {}, p.lastContact ? `Last talked ${relDays(dayNum(p.lastContact) - todayNum())} (${fmtDay(p.lastContact)})` : 'No catch-up logged yet'));
+    } else {
+      lines.push(h('b', {}, 'No reminder'));
+      lines.push(h('span', {}, p.lastContact ? `Last talked ${relDays(dayNum(p.lastContact) - todayNum())} (${fmtDay(p.lastContact)}). Pick how often to catch up.` : 'Pick how often you want to catch up and Kith will remind you.'));
+    }
+    wrap.append(h('div', { class: 'touch-card' + state }, icon(i && i.left <= 0 ? 'bell' : 'clock', 20), h('div', {}, lines)));
+    wrap.append(cadencePicker(i ? i.cadence : 0, (d) => setCadence(p.id, d), true));
+    const log = p.log || [];
+    if (log.length) {
+      const show = args.allLog ? log : log.slice(0, 4);
+      wrap.append(
+        h('div', { class: 'eyebrow' }, `Catch-ups · ${log.length}`, log.length > 4 ? h('button', { class: 'link', type: 'button', onclick: () => { args.allLog = !args.allLog; renderSheet(false); } }, args.allLog ? 'Show fewer' : 'Show all') : ''),
+        h('ol', { class: 'log' }, show.map((e) => h('li', {}, h('span', { class: 'when' }, fmtDay(e.d)), h('span', {}, e.note || 'Caught up')))),
+      );
+    }
+    return wrap;
+  }
+
+  VIEWS.logTouch = ({ id }) => {
+    const p = S.people[id];
+    if (!p) return null;
+    const date = h('input', { class: 'input', type: 'date', id: 'lt-date', value: todayStr(), max: todayStr() });
+    const note = h('textarea', { class: 'input', id: 'lt-note', rows: '3', placeholder: 'What did you talk about? Anything to follow up on? (optional)' });
+    let cad = dueInfo(p) ? dueInfo(p).cadence : 0;
+    const body = h(
+      'form',
+      { class: 'form', onsubmit: (e) => { e.preventDefault(); save(); } },
+      h('div', { class: 'p-head' }, avatar(p, 'bigav'), h('div', {}, h('h3', { class: 'p-name' }, p.name || 'Unnamed'), h('div', { class: 'p-role' }, touchLine(p) || 'No reminder set'))),
+      h('div', { class: 'field' }, h('label', { for: 'lt-date' }, 'When'), date),
+      h('div', { class: 'field' }, h('label', { for: 'lt-note' }, 'Note'), note),
+      h('div', { class: 'field' }, h('span', { class: 'lbl' }, 'Keep in touch'), cadencePicker(cad, (d) => { cad = d; }, true)),
+    );
+    function save() {
+      const d = dayNum(date.value) != null && date.value <= todayStr() ? date.value : todayStr();
+      if (cad !== (dueInfo(p) ? dueInfo(p).cadence : 0)) savePerson({ ...S.people[id], cadence: cad, cadenceFrom: S.people[id].cadenceFrom || todayStr() });
+      logTouch(id, d, note.value);
+      sheetBack();
+    }
+    const foot = h('div', { class: 'foot-row' }, h('button', { class: 'btn', type: 'button', onclick: () => (Sheet.stack.length > 1 ? sheetBack() : closeSheet()) }, 'Cancel'), h('button', { class: 'btn primary', type: 'button', onclick: save }, icon('check', 18), 'Log catch-up'));
+    return { title: 'Log a catch-up', body, foot };
+  };
+
+  function touchRow(p, sub, action) {
+    return h(
+      'div',
+      { class: 'touch-row' },
+      h('button', { class: 'touch-main', type: 'button', onclick: () => selectPerson(p.id, { open: true, push: true, center: true }) }, avatar(p), h('div', {}, h('div', { class: 't' }, p.name || 'Unnamed'), h('div', { class: 'd' }, sub))),
+      action || '',
+    );
+  }
+  VIEWS.touch = () => {
+    const rows = others().map((p) => ({ p, i: dueInfo(p), b: birthdayInfo(p) }));
+    const withRem = rows.filter((r) => r.i);
+    const sortLeft = (a, b) => a.i.left - b.i.left;
+    const due = withRem.filter((r) => r.i.left <= 0).sort(sortLeft);
+    const week = withRem.filter((r) => r.i.left > 0 && r.i.left <= 7).sort(sortLeft);
+    const soon = withRem.filter((r) => r.i.left > 7 && r.i.left <= 30).sort(sortLeft);
+    const later = withRem.filter((r) => r.i.left > 30).sort(sortLeft);
+    const bdays = rows.filter((r) => r.b && r.b.days <= 30).sort((a, b) => a.b.days - b.b.days);
+    const caught = (p) => h('button', { class: 'btn sm', type: 'button', onclick: () => logTouch(p.id) }, icon('check', 15), 'Caught up');
+    const body = h('div', {});
+    const section = (label, list, render) => {
+      if (!list.length) return;
+      body.append(h('div', { class: 'eyebrow' }, `${label} · ${list.length}`), h('div', { class: 'touch-list' }, list.map(render)));
+    };
+    if (!withRem.length) {
+      body.append(h('div', { class: 'status-card' }, icon('bell'), h('div', {}, h('b', {}, 'Stay close to the people who matter'), 'Choose how often you want to catch up with someone. When it’s been too long, they show up here and get a dot on the map. Log a catch-up and the clock resets.')));
+    }
+    section('Time to catch up', due, (r) => touchRow(r.p, touchLine(r.p, true), caught(r.p)));
+    section('Birthdays', bdays, (r) => touchRow(r.p, `${r.b.days === 0 ? 'Today' : uc1(relDays(r.b.days))} · ${r.b.label.replace(/, \d{4}$/, '')}${r.b.age ? ` · turns ${r.b.age}` : ''}`, r.b.days <= 1 ? caught(r.p) : ''));
+    section('This week', week, (r) => touchRow(r.p, touchLine(r.p, true), caught(r.p)));
+    section('Next 30 days', soon, (r) => touchRow(r.p, touchLine(r.p, true)));
+    section('Later', later, (r) => touchRow(r.p, touchLine(r.p, true)));
+    // suggest the people closest to you who don't have a reminder yet
+    const strength = (id) => Math.max(0, ...relsOf(id).filter((r) => r.a === ME || r.b === ME).map((r) => r.strength || 2));
+    const sugg = others().filter((p) => !dueInfo(p) && strength(p.id) > 0).sort((a, b) => strength(b.id) - strength(a.id)).slice(0, 8);
+    if (sugg.length) {
+      body.append(h('div', { class: 'eyebrow' }, 'Set up reminders'), h('div', { class: 'touch-list' }, sugg.map((p) => touchRow(p, roleLine(p) || relsOf(p.id).filter((r) => r.a === ME || r.b === ME).map((r) => relSentence(r))[0] || '', h('div', { class: 'mini-select' }, cadenceSelect(0, (d) => setCadence(p.id, d)))))));
+    }
+    if (others().length < 5) body.append(h('div', { class: 'eyebrow' }, 'Bring in more people'), h('button', { class: 'btn', type: 'button', onclick: () => openSheet('importHelp', {}) }, icon('contacts', 18), 'Import your contacts'));
+    return { title: 'Keep in touch', body };
+  };
+  VIEWS.touch.live = true;
+
+  function renderTouchBadge() {
+    if (!E.touchBadge) return;
+    const n = remindersNow();
+    E.touchBadge.hidden = !n;
+    E.touchBadge.textContent = n > 99 ? '99+' : String(n);
+    E.btnTouch.setAttribute('aria-label', n ? `Keep in touch: ${n} due` : 'Keep in touch');
+  }
+
+  /* =====================================================================
+     Contact import: vCard (.vcf) and CSV (Google, Outlook, LinkedIn, Apple…)
+     ===================================================================== */
+  const vUnesc = (s) => String(s).replace(/\\n/gi, '\n').replace(/\\([,;:\\])/g, '$1');
+  function vSplit(s) {
+    const out = [];
+    let cur = '';
+    for (let i = 0; i < s.length; i++) {
+      const c = s[i];
+      if (c === '\\' && i + 1 < s.length) { cur += c + s[i + 1]; i++; }
+      else if (c === ';') { out.push(cur); cur = ''; }
+      else cur += c;
+    }
+    out.push(cur);
+    return out.map(vUnesc);
+  }
+  function vValue(prop) {
+    let v = prop.value;
+    if (/QUOTED-PRINTABLE/i.test(prop.params.ENCODING || '') || 'QUOTED-PRINTABLE' in prop.params) {
+      const bytes = [];
+      const enc = new TextEncoder();
+      v.replace(/=([0-9A-F]{2})|([\s\S])/gi, (m0, hex, ch) => {
+        if (hex) bytes.push(parseInt(hex, 16));
+        else bytes.push(...enc.encode(ch));
+        return '';
+      });
+      try { v = new TextDecoder((prop.params.CHARSET || 'utf-8').toLowerCase()).decode(new Uint8Array(bytes)); } catch { v = new TextDecoder().decode(new Uint8Array(bytes)); }
+    }
+    return v;
+  }
+  function parseVCards(text) {
+    const lines = String(text).replace(/\r\n?/g, '\n').split('\n');
+    const unf = [];
+    for (const line of lines) {
+      const prev = unf[unf.length - 1];
+      if (prev != null && /^[ \t]/.test(line)) { unf[unf.length - 1] = prev + line.slice(1); continue; }
+      if (prev != null && /=$/.test(prev) && /QUOTED-PRINTABLE/i.test(prev.split(':')[0])) { unf[unf.length - 1] = prev.slice(0, -1) + line; continue; }
+      unf.push(line);
+    }
+    const out = [];
+    let props = null;
+    for (const line of unf) {
+      if (/^BEGIN:VCARD/i.test(line)) { props = []; continue; }
+      if (/^END:VCARD/i.test(line)) { if (props) { const c = cardToContact(props); if (c) out.push(c); } props = null; continue; }
+      if (!props) continue;
+      const i = line.indexOf(':');
+      if (i < 0) continue;
+      const parts = line.slice(0, i).split(';');
+      let name = parts[0].toUpperCase();
+      if (name.includes('.')) name = name.split('.').pop();
+      const params = {};
+      const types = [];
+      for (const pr of parts.slice(1)) {
+        const eq = pr.indexOf('=');
+        const k = (eq < 0 ? 'TYPE' : pr.slice(0, eq)).toUpperCase();
+        const v = eq < 0 ? pr : pr.slice(eq + 1);
+        if (eq < 0 && /^(QUOTED-PRINTABLE|BASE64|B)$/i.test(v)) params.ENCODING = v;
+        else params[k] = params[k] ? params[k] + ',' + v : v;
+        if (k === 'TYPE') types.push(...v.toLowerCase().replace(/"/g, '').split(','));
+      }
+      props.push({ name, params, types, value: line.slice(i + 1) });
+    }
+    return out;
+  }
+  function cardToContact(props) {
+    const all = (n) => props.filter((p) => p.name === n);
+    const best = (list) => list.find((p) => p.types.includes('pref') || 'PREF' in p.params) || list.find((p) => p.types.includes('cell') || p.types.includes('mobile') || p.types.includes('iphone')) || list[0];
+    const text = (p) => (p ? vUnesc(vValue(p)).trim() : '');
+    let name = text(all('FN')[0]);
+    const n = all('N')[0];
+    let given = '';
+    let family = '';
+    if (n) {
+      const parts = vSplit(vValue(n));
+      family = (parts[0] || '').trim();
+      given = (parts[1] || '').trim();
+      if (!name) name = [parts[3], given, parts[2], family, parts[4]].map((x) => (x || '').trim()).filter(Boolean).join(' ');
+    }
+    const org = all('ORG')[0];
+    const company = org ? (vSplit(vValue(org))[0] || '').trim() : '';
+    const isOrg = all('X-ABSHOWAS').some((p) => /company/i.test(p.value));
+    if (isOrg && !given && !family) return null;
+    if (!name || (name === company && !given && !family)) return null;
+    const adr = best(all('ADR'));
+    let location = '';
+    if (adr) {
+      const a = vSplit(vValue(adr));
+      location = [a[3], a[4] || a[6]].map((x) => (x || '').trim()).filter(Boolean).join(', ');
+    }
+    const email = text(best(all('EMAIL'))).replace(/^mailto:/i, '');
+    const phone = text(best(all('TEL'))).replace(/^tel:/i, '');
+    const urls = [...all('URL'), ...all('X-SOCIALPROFILE')].map(text).filter((u) => /^https?:\/\//i.test(u));
+    const link = urls.find((u) => /linkedin\.com/i.test(u)) || urls[0] || '';
+    let photo = '';
+    const ph = all('PHOTO')[0];
+    if (ph) {
+      const v = ph.value.replace(/\s+/g, '');
+      if (/^data:image\//i.test(v)) photo = v;
+      else if (/^(b|base64)$/i.test(ph.params.ENCODING || '') && v.length > 100) {
+        const type = (ph.params.TYPE || ph.types[0] || 'jpeg').toLowerCase().replace(/^image\//, '');
+        photo = `data:image/${type === 'jpg' ? 'jpeg' : type};base64,${v}`;
+      }
+    }
+    return {
+      name: name.replace(/\s+/g, ' '),
+      title: text(all('TITLE')[0]) || text(all('ROLE')[0]),
+      company,
+      email,
+      phone,
+      location,
+      birthday: parseBirthday(text(all('BDAY')[0])),
+      details: text(all('NOTE')[0]),
+      link,
+      photo,
+    };
+  }
+  function parseCSV(text) {
+    text = String(text).replace(/^﻿/, '');
+    const head = text.split('\n').slice(0, 8).join('\n');
+    const count = (ch) => (head.match(new RegExp('\\' + ch, 'g')) || []).length;
+    const sep = count('\t') > count(',') ? '\t' : count(';') > count(',') ? ';' : ',';
+    const rows = [];
+    let row = [];
+    let cell = '';
+    let q = false;
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (q) {
+        if (c === '"') { if (text[i + 1] === '"') { cell += '"'; i++; } else q = false; }
+        else cell += c;
+      } else if (c === '"' && cell === '') q = true;
+      else if (c === sep) { row.push(cell); cell = ''; }
+      else if (c === '\n' || c === '\r') {
+        if (c === '\r' && text[i + 1] === '\n') i++;
+        row.push(cell);
+        rows.push(row);
+        row = [];
+        cell = '';
+      } else cell += c;
+    }
+    if (cell || row.length) { row.push(cell); rows.push(row); }
+    return rows.filter((r) => r.some((x) => x.trim()));
+  }
+  const CSV_ROLES = [
+    ['name', /^(full ?name|name|display ?name|contact ?name|contact)$/],
+    ['first', /^(first|given)( ?name)?$/],
+    ['middle', /^(middle|additional)( ?name)?$/],
+    ['last', /^(last|family|sur)( ?name)?$|^surname$/],
+    ['company', /^(company|company ?name|employer|organi[sz]ation|organi[sz]ation ?(1 ?)?(- ?)?name)$/],
+    ['title', /^(job ?title|title|position|role|organi[sz]ation ?(1 ?)?(- ?)?title)$/],
+    ['email', /e-?mail/],
+    ['phone', /phone|mobile|^tel/],
+    ['city', /city/],
+    ['region', /region|state|province/],
+    ['country', /country/],
+    ['location', /^(location|address|home address|place)$/],
+    ['birthday', /birth/],
+    ['notes', /^notes?$/],
+    ['url', /url|website|web ?page|linkedin/],
+    ['connected', /connected on/],
+  ];
+  function csvToContacts(rows) {
+    let hi = -1;
+    let map = null;
+    for (let r = 0; r < Math.min(rows.length, 15) && hi < 0; r++) {
+      const m = {};
+      rows[r].forEach((hd, c) => {
+        const k = norm(hd).replace(/\s+/g, ' ');
+        if (!k || /(- ?|\b)(type|label)$/.test(k) || /phonetic|yomi/.test(k)) return;
+        const role = CSV_ROLES.find(([, re]) => re.test(k));
+        if (role) (m[role[0]] = m[role[0]] || []).push(c);
+      });
+      const known = ['name', 'first', 'last', 'email', 'company', 'phone'].filter((k) => m[k]).length;
+      if (known >= 2 && (m.name || m.first || m.last)) { hi = r; map = m; }
+    }
+    if (hi < 0) return [];
+    const out = [];
+    for (const row of rows.slice(hi + 1)) {
+      const g = (k) => {
+        for (const c of map[k] || []) { const v = (row[c] || '').trim(); if (v) return v; }
+        return '';
+      };
+      const name = (g('name') || [g('first'), g('middle'), g('last')].filter(Boolean).join(' ')).replace(/\s+/g, ' ').trim();
+      if (!name) continue;
+      const loc = g('location') || [g('city'), g('region') || g('country')].filter(Boolean).join(', ');
+      const url = g('url');
+      const conn = g('connected');
+      const details = [g('notes'), conn ? `Connected on LinkedIn ${conn}.` : ''].filter(Boolean).join('\n');
+      out.push({ name, title: g('title'), company: g('company'), email: g('email').split(/\s*:::\s*/)[0], phone: g('phone').split(/\s*:::\s*/)[0], location: loc, birthday: parseBirthday(g('birthday')), details, link: /^https?:\/\//i.test(url) ? url : '', photo: '' });
+    }
+    return out;
+  }
+  function readContactsText(text) {
+    if (/BEGIN:VCARD/i.test(text)) return parseVCards(text);
+    return csvToContacts(parseCSV(text));
+  }
+  function matchContact(c) {
+    const em = norm(c.email);
+    for (const p of others()) {
+      if (em && norm(p.email) === em) return p.id;
+    }
+    const n = norm(c.name);
+    const same = others().filter((p) => norm(p.name) === n);
+    return same.length === 1 ? same[0].id : null;
+  }
+  function openContacts(text, source) {
+    let list = [];
+    try { list = readContactsText(text); } catch { list = []; }
+    const seen = new Set();
+    list = list.filter((c) => {
+      const k = norm(c.name) + '|' + norm(c.email);
+      if (seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    });
+    if (!list.length) {
+      toast('No contacts found in that file. Use a .vcf file or a CSV with a name column.');
+      return;
+    }
+    for (const c of list) c.existingId = matchContact(c);
+    openSheet('importReview', { contacts: list, source }, { root: true });
+  }
+  function importContactsFile(file) {
+    const fr = new FileReader();
+    fr.onload = () => openContacts(String(fr.result || ''), file.name || 'your file');
+    fr.onerror = () => toast('That file couldn’t be read.');
+    fr.readAsText(file);
+  }
+  const canPickContacts = () => 'contacts' in navigator && 'ContactsManager' in window && !(window.claude && window.claude.use);
+  async function pickPhoneContacts() {
+    try {
+      const avail = await navigator.contacts.getProperties();
+      const want = ['name', 'email', 'tel', 'address', 'icon'].filter((x) => avail.includes(x));
+      const picked = await navigator.contacts.select(want, { multiple: true });
+      const list = picked.map((c) => {
+        const a = (c.address || [])[0];
+        return { name: ((c.name || [])[0] || '').trim(), title: '', company: '', email: (c.email || [])[0] || '', phone: (c.tel || [])[0] || '', location: a ? [a.city, a.region || a.country].filter(Boolean).join(', ') : '', birthday: '', details: '', link: '', photo: (c.icon || [])[0] || '' };
+      }).filter((c) => c.name);
+      if (!list.length) return;
+      for (const c of list) c.existingId = matchContact(c);
+      openSheet('importReview', { contacts: list, source: 'your phone' }, { root: true });
+    } catch { /* the person closed the picker */ }
+  }
+
+  VIEWS.importHelp = () => {
+    const step = (title, ...lines) => h('details', { class: 'howto' }, h('summary', {}, title, icon('right', 16)), h('ol', {}, lines.map((l) => h('li', {}, l))));
+    const body = h(
+      'div',
+      { class: 'form' },
+      h('p', { class: 'muted-note' }, 'Bring people in from a contacts file. You choose who to add, and anyone already on your map gets filled in instead of duplicated. Nothing is uploaded anywhere else.'),
+      canPickContacts() ? h('button', { class: 'btn primary', type: 'button', onclick: pickPhoneContacts }, icon('contacts', 18), 'Pick from this phone’s contacts') : '',
+      h('button', { class: 'btn' + (canPickContacts() ? '' : ' primary'), type: 'button', onclick: () => { E.fileContacts.value = ''; E.fileContacts.click(); } }, icon('upload', 18), 'Choose a contacts file (.vcf or .csv)'),
+      h('div', { class: 'eyebrow' }, 'How to get the file'),
+      step('iPhone', 'Open the Contacts app and tap Lists (top left).', 'Touch and hold All Contacts (or any list), then tap Export.', 'Save it to Files, come back here and choose that file.', 'For one person: open the contact, tap Share Contact, then Save to Files.'),
+      step('Mac', 'Open the Contacts app and select the people you want (⌘A selects everyone).', 'Choose File → Export → Export vCard.', 'Choose the saved .vcf file here.'),
+      step('Google / Android', 'Go to contacts.google.com.', 'Click Export, choose vCard or Google CSV, then Export.', 'Choose the downloaded file here.'),
+      step('Outlook', 'In Outlook on the web, open People.', 'Choose Manage contacts → Export contacts, then Export.', 'Choose the downloaded .csv file here.'),
+      step('LinkedIn', 'Open Settings & Privacy → Data privacy → Get a copy of your data.', 'Pick Connections, then Request archive. LinkedIn emails you a link.', 'Open the download and choose Connections.csv here.'),
+      h('p', { class: 'muted-note' }, 'Tip: you can also drop a .vcf or .csv file anywhere on the map, or paste a contact card.'),
+    );
+    return { title: 'Import contacts', body };
+  };
+
+  VIEWS.importReview = (args) => {
+    const list = args.contacts;
+    const st = args._st || (args._st = { q: '', sel: new Set(list.map((c, i) => (list.length <= 40 && !c.existingId ? i : -1)).filter((i) => i >= 0)), cadence: 0 });
+    const body = h('div', {});
+    const nNew = list.filter((c) => !c.existingId).length;
+    body.append(h('p', { class: 'review-note' }, `Found ${plural(list.length, 'contact', 'contacts')} in ${args.source}${nNew < list.length ? `, ${list.length - nNew} already on your map` : ''}. Pick who to add — people already on your map just get their empty fields filled in.`));
+    const search = h('input', { class: 'input', type: 'search', placeholder: 'Search name, company or city', 'aria-label': 'Search contacts', value: st.q });
+    const count = h('span', { class: 'imp-count' });
+    const listEl = h('div', { class: 'imp-list' });
+    const more = h('p', { class: 'muted-note', style: 'padding:6px 2px' });
+    const hay = (c) => norm([c.name, c.title, c.company, c.location, c.email].join(' '));
+    const visible = () => list.map((c, i) => i).filter((i) => !st.q || hay(list[i]).includes(norm(st.q)));
+    const addBtn = h('button', { class: 'btn primary', type: 'button' });
+    const paintCount = () => {
+      const n = st.sel.size;
+      count.textContent = `${n} selected`;
+      addBtn.disabled = !n;
+      addBtn.replaceChildren(icon('check', 18), n ? `Add ${plural(n, 'person', 'people')}` : 'Add people');
+    };
+    const draw = () => {
+      const idx = visible();
+      const cap = 300;
+      listEl.replaceChildren(
+        ...idx.slice(0, cap).map((i) => {
+          const c = list[i];
+          const on = st.sel.has(i);
+          const row = h(
+            'button',
+            { class: 'imp-row' + (on ? ' on' : ''), type: 'button', 'aria-pressed': String(on) },
+            h('span', { class: 'toggle', 'aria-hidden': 'true' }, icon('check')),
+            c.photo && typeof c.photo === 'string' ? h('div', { class: 'miniav' }, h('img', { src: c.photo, alt: '' })) : avatar({ id: 'x', name: c.name }),
+            h('div', {}, h('div', { class: 't' }, c.name, c.existingId ? h('span', { class: 'badge upd' }, 'On map') : ''), h('div', { class: 'd' }, [c.title && c.company ? `${c.title} at ${c.company}` : c.title || c.company, c.location].filter(Boolean).join(' · ') || c.email || c.phone || ' ')),
+          );
+          row.addEventListener('click', () => {
+            if (st.sel.has(i)) st.sel.delete(i);
+            else st.sel.add(i);
+            const now2 = st.sel.has(i);
+            row.classList.toggle('on', now2);
+            row.setAttribute('aria-pressed', String(now2));
+            paintCount();
+          });
+          return row;
+        }),
+      );
+      more.textContent = idx.length > cap ? `Showing ${cap} of ${idx.length}. Search to find the rest; Select all still selects every match.` : idx.length ? '' : 'No contacts match that.';
+      paintCount();
+    };
+    search.addEventListener('input', () => { st.q = search.value; draw(); });
+    const bar = h(
+      'div',
+      { class: 'imp-bar' },
+      h('button', { class: 'btn sm', type: 'button', onclick: () => { for (const i of visible()) st.sel.add(i); draw(); } }, 'Select all'),
+      h('button', { class: 'btn sm ghost', type: 'button', onclick: () => { for (const i of visible()) st.sel.delete(i); draw(); } }, 'Clear'),
+      count,
+    );
+    body.append(h('div', { class: 'search-box', style: 'position:relative' }, icon('search', 18), search), bar, listEl, more);
+    if (list.length > 150) body.append(h('p', { class: 'muted-note' }, 'Big maps get crowded. Start with the people who matter most; you can import again later.'));
+    body.append(h('div', { class: 'field', style: 'margin-top:14px' }, h('label', { for: 'imp-cad' }, 'Remind me to keep in touch with them'), cadenceSelect(st.cadence, (d) => { st.cadence = d; }, 'imp-cad')));
+    addBtn.addEventListener('click', async () => {
+      const chosen = [...st.sel].sort((a, b) => a - b).map((i) => list[i]);
+      if (!chosen.length) return;
+      addBtn.disabled = true;
+      await applyImport(chosen, st.cadence, (msg) => addBtn.replaceChildren(msg));
+    });
+    draw();
+    const foot = h('div', { class: 'foot-row' }, h('button', { class: 'btn', type: 'button', onclick: closeSheet }, 'Cancel'), addBtn);
+    return { title: 'Import contacts', body, foot };
+  };
+
+  async function applyImport(chosen, cadence, progress) {
+    const withPhoto = chosen.filter((c) => c.photo);
+    let done = 0;
+    for (const c of withPhoto) {
+      try { c.photoSmall = await readPhoto(c.photo, 128); } catch { c.photoSmall = ''; }
+      done++;
+      if (done % 5 === 0 || done === withPhoto.length) progress(`Preparing photos ${done}/${withPhoto.length}…`);
+    }
+    const created = [];
+    const before = {};
+    const today = todayStr();
+    const fresh = chosen.filter((c) => !c.existingId).sort((a, b) => (a.company || '~').localeCompare(b.company || '~') || a.name.localeCompare(b.name));
+    // new people go in a tidy block beside the map, colleagues next to each other
+    const pts = peopleList().map((p) => pos(p.id));
+    const maxX = Math.max(...pts.map((q) => q.x));
+    const midY = avg(pts.map((q) => q.y));
+    const cols = Math.max(3, Math.ceil(Math.sqrt(fresh.length * 1.4)));
+    const rowsN = Math.ceil(fresh.length / cols);
+    const x0 = maxX + 300;
+    const y0 = midY - ((rowsN - 1) * 150) / 2;
+    fresh.forEach((c, i) => {
+      const id = newId('p');
+      created.push(id);
+      savePerson({
+        id,
+        name: c.name,
+        title: c.title || '',
+        company: c.company || '',
+        location: c.location || '',
+        traits: [],
+        details: c.details || '',
+        email: c.email || '',
+        phone: c.phone || '',
+        link: c.link || '',
+        birthday: c.birthday || '',
+        photo: c.photoSmall || '',
+        cadence: cadence || 0,
+        cadenceFrom: cadence ? today : '',
+        x: Math.round(x0 + (i % cols) * 185),
+        y: Math.round(y0 + Math.floor(i / cols) * 150),
+      });
+    });
+    let updated = 0;
+    for (const c of chosen.filter((x) => x.existingId)) {
+      const cur = S.people[c.existingId];
+      if (!cur) continue;
+      const next = clone(cur);
+      let changed = false;
+      for (const f of ['title', 'company', 'location', 'email', 'phone', 'link', 'birthday']) {
+        if (!next[f] && c[f]) { next[f] = c[f]; changed = true; }
+      }
+      if (!next.photo && c.photoSmall) { next.photo = c.photoSmall; changed = true; }
+      if (c.details && !norm(next.details).includes(norm(c.details))) { next.details = next.details ? next.details.trim() + '\n' + c.details : c.details; changed = true; }
+      if (cadence && !next.cadence) { next.cadence = cadence; next.cadenceFrom = today; changed = true; }
+      if (!changed) continue;
+      before[cur.id] = clone(cur);
+      savePerson(next);
+      updated++;
+    }
+    onData();
+    closeSheet();
+    setTimeout(() => (created.length ? frame([...created, ...Object.keys(S.people).slice(0, 400)], { minK: 0.25 }) : null), 60);
+    const msg = [created.length ? `Added ${plural(created.length, 'person', 'people')}` : '', updated ? `updated ${plural(updated, 'person', 'people')}` : ''].filter(Boolean).join(', ');
+    toast(uc1(msg || 'Nothing new to add'), {
+      action: created.length || updated ? 'Undo' : null,
+      ms: 8000,
+      run: () => {
+        for (const id of created) removeDoc(id);
+        for (const v of Object.values(before)) savePerson(v);
+        withMe(S.people);
+        onData();
+      },
+    });
   }
 
   /* ---------- relationship ---------- */
@@ -3268,22 +4052,22 @@ select.input { padding-right: 34px; background-image: linear-gradient(45deg, tra
     draw();
     return { el: wrap, get: () => { commit(); return tags; } };
   }
-  async function readPhoto(file) {
-    const url = URL.createObjectURL(file);
+  async function readPhoto(src, s = 200) {
+    const own = typeof src !== 'string';
+    const url = own ? URL.createObjectURL(src) : src;
     try {
       const img = new Image();
       img.src = url;
       await img.decode();
-      const s = 200;
       const c = document.createElement('canvas');
       c.width = s;
       c.height = s;
       const ctx = c.getContext('2d');
       const m = Math.min(img.naturalWidth, img.naturalHeight);
       ctx.drawImage(img, (img.naturalWidth - m) / 2, (img.naturalHeight - m) / 2, m, m, 0, 0, s, s);
-      return c.toDataURL('image/jpeg', 0.84);
+      return c.toDataURL('image/jpeg', s < 160 ? 0.8 : 0.84);
     } finally {
-      URL.revokeObjectURL(url);
+      if (own) URL.revokeObjectURL(url);
     }
   }
   function datalist(id, field) {
@@ -3294,7 +4078,7 @@ select.input { padding-right: 34px; background-image: linear-gradient(45deg, tra
     const p = args.id ? S.people[args.id] : null;
     if (args.id && !p) return null;
     const isMe = args.id === ME;
-    const st = args._st || (args._st = p ? clone(p) : { name: args.name || '', title: '', company: '', location: '', traits: [], details: '', email: '', phone: '', photo: '' });
+    const st = args._st || (args._st = p ? { ...clone(p), birthdayText: birthdayText(p.birthday) } : { name: args.name || '', title: '', company: '', location: '', traits: [], details: '', email: '', phone: '', photo: '', link: '', birthdayText: '', cadence: 0 });
     const field = (key, label, attrs = {}) => {
       const inp = h('input', { class: 'input', id: 'pe-' + key, value: st[key] || '', autocomplete: 'off', ...attrs });
       inp.addEventListener('input', () => { st[key] = inp.value; if (key === 'name') paintAv(); });
@@ -3328,6 +4112,8 @@ select.input { padding-right: 34px; background-image: linear-gradient(45deg, tra
       h('div', { class: 'field' }, h('label', { for: 'pe-traits' }, 'Traits'), tags.el),
       h('div', { class: 'field' }, h('label', { for: 'pe-details' }, 'Details'), details),
       h('div', { class: 'row2' }, field('email', 'Email', { type: 'email', placeholder: 'name@example.com', inputmode: 'email' }), field('phone', 'Phone', { type: 'tel', placeholder: '+1 555 0100', inputmode: 'tel' })),
+      h('div', { class: 'row2' }, field('birthdayText', 'Birthday', { placeholder: 'Mar 14 or 1990-03-14' }), field('link', 'Link', { type: 'url', placeholder: 'linkedin.com/in/…', inputmode: 'url' })),
+      isMe ? '' : h('div', { class: 'field' }, h('label', { for: 'pe-cadence' }, 'Keep in touch'), cadenceSelect(+st.cadence || 0, (d) => { st.cadence = d; }, 'pe-cadence')),
       datalist('dl-company', 'company'),
       datalist('dl-location', 'location'),
       err,
@@ -3336,7 +4122,14 @@ select.input { padding-right: 34px; background-image: linear-gradient(45deg, tra
       st.traits = tags.get();
       const name = (st.name || '').trim();
       if (!name && !isMe) { err.textContent = 'Add a name first.'; err.hidden = false; $('#pe-name').focus(); return; }
-      const fields = { name, title: (st.title || '').trim(), company: (st.company || '').trim(), location: (st.location || '').trim(), traits: st.traits, details: (st.details || '').trim(), email: (st.email || '').trim(), phone: (st.phone || '').trim(), photo: st.photo || '' };
+      const bText = (st.birthdayText || '').trim();
+      const birthday = parseBirthday(bText);
+      if (bText && !birthday) { err.textContent = 'Write the birthday like “Mar 14” or “1990-03-14”.'; err.hidden = false; $('#pe-birthdayText').focus(); return; }
+      let link = (st.link || '').trim();
+      if (link && !/^https?:\/\//i.test(link)) link = 'https://' + link;
+      const cadence = isMe ? 0 : +st.cadence || 0;
+      const fields = { name, title: (st.title || '').trim(), company: (st.company || '').trim(), location: (st.location || '').trim(), traits: st.traits, details: (st.details || '').trim(), email: (st.email || '').trim(), phone: (st.phone || '').trim(), photo: st.photo || '', birthday, link, cadence };
+      if (cadence && !(p && (p.lastContact || p.cadenceFrom))) fields.cadenceFrom = todayStr();
       let saved;
       if (p) saved = savePerson({ ...p, ...fields });
       else {
@@ -3449,6 +4242,16 @@ select.input { padding-right: 34px; background-image: linear-gradient(45deg, tra
       };
       const grid = h('div', { class: 'dgrid' }, inp('title', 'Title'), inp('company', 'Company'), inp('location', 'Location'), inp('traits', 'Traits'), inp('details', 'Details', true));
       if (p.email || p.phone) grid.append(inp('email', 'Email'), inp('phone', 'Phone'));
+      if (p.birthday) {
+        p.birthdayText = birthdayText(p.birthday);
+        grid.append(inp('birthdayText', 'Birthday'));
+      }
+      if (p.lastContact) {
+        const dt = h('input', { class: 'input', type: 'date', value: p.lastContact, max: todayStr(), 'aria-label': 'Last talked' });
+        dt.addEventListener('input', () => { p.lastContact = dt.value; });
+        grid.append(h('label', {}, h('span', { class: 'mini-lbl' }, 'Last talked'), dt), inp('touchNote', 'Catch-up note'));
+      }
+      if (p.cadenceDays || p.lastContact) grid.append(h('label', { class: 'full' }, h('span', { class: 'mini-lbl' }, 'Keep in touch'), cadenceSelect(p.cadenceDays || 0, (v) => { p.cadenceDays = v; })));
       card.append(head, grid);
       body.append(card);
     }
@@ -3483,6 +4286,18 @@ select.input { padding-right: 34px; background-image: linear-gradient(45deg, tra
     return { title: 'Review', body, foot };
   };
 
+  function applyTouchFields(next, p) {
+    if (next.id === ME) return next;
+    const b = p.birthdayText != null ? parseBirthday(p.birthdayText) || p.birthday : p.birthday;
+    if (b) next.birthday = b;
+    if (p.cadenceDays) { next.cadence = p.cadenceDays; if (!next.lastContact && !next.cadenceFrom) next.cadenceFrom = todayStr(); }
+    const lc = dayNum(p.lastContact) != null && p.lastContact <= todayStr() ? p.lastContact : '';
+    if (lc) {
+      next.log = [{ d: lc, note: str(p.touchNote) }, ...(next.log || [])].sort((a, c) => (a.d < c.d ? 1 : a.d > c.d ? -1 : 0)).slice(0, 60);
+      if (!next.lastContact || lc > next.lastContact) next.lastContact = lc;
+    }
+    return next;
+  }
   function applyDraft(d) {
     const ids = { [ME]: ME };
     const created = [];
@@ -3504,6 +4319,7 @@ select.input { padding-right: 34px; background-image: linear-gradient(45deg, tra
         for (const t of p.traits) if (!next.traits.some((x) => norm(x) === norm(t))) next.traits.push(t);
         const det = str(p.details);
         if (det && !norm(cur.details).includes(norm(det))) next.details = cur.details ? cur.details.trim() + '\n' + det : det;
+        applyTouchFields(next, p);
         savePerson(next);
         touched.add(cur.id);
       } else {
@@ -3512,7 +4328,7 @@ select.input { padding-right: 34px; background-image: linear-gradient(45deg, tra
         const id = newId('p');
         ids[p.ref] = id;
         created.push(id);
-        S.people[id] = { kind: 'person', id, name, title: str(p.title), company: str(p.company), location: str(p.location), traits: [...new Set(p.traits.map(str).filter(Boolean))], details: str(p.details), email: str(p.email), phone: str(p.phone), photo: '', x: NaN, y: NaN, createdAt: now() };
+        S.people[id] = applyTouchFields({ kind: 'person', id, name, title: str(p.title), company: str(p.company), location: str(p.location), traits: [...new Set(p.traits.map(str).filter(Boolean))], details: str(p.details), email: str(p.email), phone: str(p.phone), photo: '', x: NaN, y: NaN, createdAt: now() }, p);
       }
     }
     const resolve = (ref) => ids[ref] || (S.people[ref] && !String(ref).startsWith('new') ? ref : null);
@@ -3669,7 +4485,7 @@ select.input { padding-right: 34px; background-image: linear-gradient(45deg, tra
     }
     const loc = count('location');
     if (loc) out.push(`Who do I know in ${loc[0]}?`);
-    out.push(AI.ok ? 'Who should I catch up with soon?' : 'Who are my closest connections?');
+    out.push(AI.ok || ps.some((p) => dueInfo(p)) ? 'Who should I catch up with soon?' : 'Who are my closest connections?');
     return out.slice(0, 4);
   }
   function askAbout(id) {
@@ -3759,7 +4575,7 @@ select.input { padding-right: 34px; background-image: linear-gradient(45deg, tra
     const ctl = new AbortController();
     Chat.ctl = ctl;
     const facts = questionFacts(q);
-    const input = [{ role: 'user', content: ASK_RULES + '\n\n<map>\n' + networkText() + '\n</map>' }];
+    const input = [{ role: 'user', content: ASK_RULES + `\n\nToday is ${todayStr()}.\n\n<map>\n` + networkText() + '\n</map>' }];
     for (const t of Chat.turns) {
       if (t === turn || !t.a || !t.a.text || t.a.error) continue;
       input.push({ role: 'user', content: t.q }, { role: 'assistant', content: t.a.text });
@@ -3821,6 +4637,8 @@ select.input { padding-right: 34px; background-image: linear-gradient(45deg, tra
         { class: 'list' },
         item('graph', 'Tidy up the map', 'Spread people out and untangle the threads', () => { closeSheet(); tidy(); }),
         item('fit', 'Fit everyone on screen', '', () => { closeSheet(); setTimeout(() => fitAll(), 50); }),
+        item('bell', 'Keep in touch', 'Catch-ups that are due and upcoming birthdays', () => openSheet('touch', {}, { root: true })),
+        item('contacts', 'Import contacts', 'From your phone, Google, Outlook or LinkedIn', () => openSheet('importHelp', {})),
         item('users', 'Edit your own details', 'Your name, work and notes about you', () => openSheet('personEdit', { id: ME })),
         item('download', 'Export a backup', 'Save everyone as a .json file', exportBackup),
         item('upload', 'Import a backup', 'Add people from a Kith .json file', () => { E.fileImport.value = ''; E.fileImport.click(); }),
@@ -3897,7 +4715,9 @@ select.input { padding-right: 34px; background-image: linear-gradient(45deg, tra
   const ID_OK = /^[\w.~:@+-]{1,120}$/;
   function cleanPerson(p) {
     const photo = typeof p.photo === 'string' && /^data:image\/(jpeg|png|webp);base64,/.test(p.photo) && p.photo.length < 220000 ? p.photo : '';
-    return { id: p.id, kind: 'person', name: str(p.name).slice(0, 200), title: str(p.title).slice(0, 200), company: str(p.company).slice(0, 200), location: str(p.location).slice(0, 200), traits: arr(p.traits).slice(0, 60).map((t) => t.slice(0, 80)), details: str(p.details).slice(0, 20000), email: str(p.email).slice(0, 200), phone: str(p.phone).slice(0, 80), photo, x: Number.isFinite(p.x) ? Math.round(p.x) : NaN, y: Number.isFinite(p.y) ? Math.round(p.y) : NaN, example: !!p.example, createdAt: Number(p.createdAt) || now() };
+    const log = Array.isArray(p.log) ? p.log.filter((e) => e && dayNum(e.d) != null).slice(0, 60).map((e) => ({ d: String(e.d).slice(0, 10), note: str(e.note).slice(0, 2000) })) : [];
+    const extra = { birthday: parseBirthday(p.birthday) || (/^--\d{2}-\d{2}$/.test(p.birthday || '') ? p.birthday : ''), link: /^https?:\/\//i.test(str(p.link)) ? str(p.link).slice(0, 500) : '', cadence: nearestCadence(p.cadence), cadenceFrom: dayNum(p.cadenceFrom) != null ? String(p.cadenceFrom).slice(0, 10) : '', lastContact: dayNum(p.lastContact) != null ? String(p.lastContact).slice(0, 10) : '', log };
+    return { ...extra, id: p.id, kind: 'person', name: str(p.name).slice(0, 200), title: str(p.title).slice(0, 200), company: str(p.company).slice(0, 200), location: str(p.location).slice(0, 200), traits: arr(p.traits).slice(0, 60).map((t) => t.slice(0, 80)), details: str(p.details).slice(0, 20000), email: str(p.email).slice(0, 200), phone: str(p.phone).slice(0, 80), photo, x: Number.isFinite(p.x) ? Math.round(p.x) : NaN, y: Number.isFinite(p.y) ? Math.round(p.y) : NaN, example: !!p.example, createdAt: Number(p.createdAt) || now() };
   }
   function importData(d) {
     const people = Array.isArray(d && d.people) ? d.people : [];
@@ -3965,8 +4785,19 @@ select.input { padding-right: 34px; background-image: linear-gradient(45deg, tra
   };
   function loadExamples() {
     const me = pos(ME);
+    const t = todayNum();
+    const dd = (n) => fromDayNum(t + n);
+    const soon = dd(4);
+    const extra = {
+      'ex-daniel': { cadence: 30, lastContact: dd(-41), log: [{ d: dd(-41), note: 'Dinner in Austin. Fundraising is slow; he wants intros to fintech angels.' }, { d: dd(-96), note: 'Called about the seed extension.' }] },
+      'ex-maya': { cadence: 90, lastContact: dd(-97), log: [{ d: dd(-97), note: 'Coffee near her office. Asked how the new fund is going.' }] },
+      'ex-theo': { cadence: 30, lastContact: dd(-12), log: [{ d: dd(-12), note: 'Monthly breakfast. Talked about board seats.' }] },
+      'ex-sofia': { cadence: 90, lastContact: dd(-83), birthday: '1988-11-02' },
+      'ex-grace': { cadence: 14, lastContact: dd(-3) },
+      'ex-hannah': { birthday: '1991' + soon.slice(4) },
+    };
     for (const [id, name, title, company, location, traits, details, x, y] of EXAMPLE.people) {
-      savePerson({ id, name, title, company, location, traits, details, email: '', phone: '', photo: '', x: Math.round(me.x + x), y: Math.round(me.y + y), example: true, createdAt: now() });
+      savePerson({ id, name, title, company, location, traits, details, email: '', phone: '', photo: '', x: Math.round(me.x + x), y: Math.round(me.y + y), example: true, createdAt: now(), ...(extra[id] || {}) });
     }
     EXAMPLE.rels.forEach(([a, b, type, category, strength, description], i) => {
       saveRel({ id: 'ex-r' + i, a, b, type, category, strength, description, example: true, createdAt: now() + i });
@@ -4219,13 +5050,17 @@ select.input { padding-right: 34px; background-image: linear-gradient(45deg, tra
      Boot
      ===================================================================== */
   function grab() {
-    const ids = ['app', 'stage', 'world', 'edge-g', 'ghost', 'labels', 'nodes', 'filters', 'stats', 'sync', 'empty', 'composer', 'composer-note', 'input', 'btn-mic', 'btn-send', 'btn-image', 'attach', 'hint', 'sheet', 'sheet-grab', 'sheet-head', 'sheet-title', 'sheet-body', 'sheet-foot', 'sheet-back', 'sheet-close', 'toast', 'loader', 'loader-text', 'file-image', 'file-photo', 'file-import', 'drop-zone', 'btn-search', 'btn-add', 'btn-menu', 'btn-zin', 'btn-zout', 'btn-fit', 'btn-example', 'btn-first'];
+    const ids = ['app', 'stage', 'world', 'edge-g', 'ghost', 'labels', 'nodes', 'filters', 'stats', 'sync', 'empty', 'composer', 'composer-note', 'input', 'btn-mic', 'btn-send', 'btn-image', 'attach', 'hint', 'sheet', 'sheet-grab', 'sheet-head', 'sheet-title', 'sheet-body', 'sheet-foot', 'sheet-back', 'sheet-close', 'toast', 'loader', 'loader-text', 'file-image', 'file-photo', 'file-import', 'drop-zone', 'btn-search', 'btn-add', 'btn-menu', 'btn-touch', 'touch-badge', 'file-contacts', 'btn-import-empty', 'btn-zin', 'btn-zout', 'btn-fit', 'btn-example', 'btn-first'];
     for (const id of ids) E[id.replace(/-(\w)/g, (_, c) => c.toUpperCase())] = document.getElementById(id);
   }
   function wire() {
     E.ghost.removeAttribute('hidden');
     E.ghost.style.display = 'none';
     E.btnSearch.append(icon('search'));
+    E.btnTouch.prepend(icon('bell'));
+    E.btnTouch.addEventListener('click', () => openSheet('touch', {}, { root: true }));
+    E.btnImportEmpty.addEventListener('click', () => openSheet('importHelp', {}, { root: true }));
+    E.fileContacts.addEventListener('change', () => { const f = E.fileContacts.files && E.fileContacts.files[0]; if (f) importContactsFile(f); });
     E.btnAdd.append(icon('userPlus'));
     E.btnMenu.append(icon('more'));
     E.btnZin.append(icon('plus', 19));
@@ -4275,6 +5110,7 @@ select.input { padding-right: 34px; background-image: linear-gradient(45deg, tra
     E.input.addEventListener('paste', (e) => {
       const img = imageFrom(e.clipboardData);
       const text = e.clipboardData && e.clipboardData.getData('text/plain');
+      if (text && /BEGIN:VCARD/i.test(text)) { e.preventDefault(); openContacts(text, 'the pasted card'); return; }
       if (img && !(text && text.trim())) { e.preventDefault(); attachImage(img); }
     });
     E.btnMic.addEventListener('click', () => toggleDictation(E.input, E.btnMic, () => submitComposer()));
@@ -4289,6 +5125,7 @@ select.input { padding-right: 34px; background-image: linear-gradient(45deg, tra
       const text = (e.clipboardData && e.clipboardData.getData('text/plain')) || '';
       if (!img && !text.trim()) return;
       e.preventDefault();
+      if (/BEGIN:VCARD/i.test(text)) { openContacts(text, 'the pasted card'); return; }
       if (sheetIsOpen() && !isWide()) closeSheet();
       if (text.trim()) {
         E.input.value = (E.input.value.trim() ? E.input.value.trim() + '\n' : '') + text.trim();
@@ -4312,6 +5149,7 @@ select.input { padding-right: 34px; background-image: linear-gradient(45deg, tra
       E.dropZone.hidden = true;
       const f = e.dataTransfer.files && e.dataTransfer.files[0];
       if (f && (/json/.test(f.type) || /\.json$/i.test(f.name))) { importFile(f); return; }
+      if (f && (/vcard|csv/.test(f.type) || /\.(vcf|vcard|csv)$/i.test(f.name))) { importContactsFile(f); return; }
       if (f && /^image\//.test(f.type)) { attachImage(f); return; }
       const text = e.dataTransfer.getData('text/plain');
       if (text) { E.input.value = text.trim(); setMode('add'); grow(); E.input.focus(); }
@@ -4366,6 +5204,11 @@ select.input { padding-right: 34px; background-image: linear-gradient(45deg, tra
       setTimeout(() => { E.loader.hidden = true; }, 450);
       S.loadedOnce = true;
       refreshSheet();
+      const due = remindersNow();
+      if (due && lsGet('kith.nudge') !== todayStr()) {
+        lsSet('kith.nudge', todayStr());
+        setTimeout(() => toast(`${plural(due, 'person is', 'people are')} due for a catch-up`, { action: 'See', run: () => openSheet('touch', {}, { root: true }) }), 1400);
+      }
       return;
     }
     onData();
