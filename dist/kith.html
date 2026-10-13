@@ -743,7 +743,7 @@ select.input { padding-right: 34px; background-image: linear-gradient(45deg, tra
   white-space: nowrap;
   transition: background 0.15s, transform 0.12s, border-color 0.15s;
 }
-a.btn { text-decoration: none; }
+a.btn, a.icon-btn { text-decoration: none; }
 .btn:hover { background: var(--surface-2); }
 .btn:active { transform: scale(0.98); }
 .btn.primary { background: var(--ink); border-color: var(--ink); color: var(--bg); }
@@ -984,6 +984,21 @@ a.btn { text-decoration: none; }
 @media (min-width: 860px) {
   .app.has-due .filters { padding-left: 12px; }
 }
+
+/* ---------- WhatsApp ---------- */
+.touch-acts { display: flex; flex-wrap: wrap; gap: 8px; margin: -2px 0 12px; }
+.row-acts { display: flex; gap: 6px; flex: none; }
+.btn.sq { width: 36px; padding: 0; }
+.wa-row { display: grid; grid-template-columns: auto auto 1fr; gap: 12px; align-items: start; padding: 10px; border-radius: 14px; }
+.wa-row .toggle { margin-top: 4px; }
+.wa-row .miniav { width: 38px; height: 38px; font-size: 13px; }
+.wa-row > div { min-width: 0; display: grid; gap: 2px; }
+.wa-row .t { font: 650 14.5px/1.3 var(--f-body); display: flex; align-items: center; gap: 8px; min-width: 0; overflow-wrap: anywhere; }
+.wa-row .t .badge { height: 19px; font-size: 9.5px; }
+.wa-row .d { font-size: 13px; color: var(--muted); }
+.wa-row .input { margin-top: 6px; height: 40px; font-size: 14.5px; border-radius: 11px; }
+.check { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: start; margin-top: 14px; padding: 12px 14px; border-radius: 14px; background: var(--surface-2); border: 1px solid var(--line); font-size: 14px; line-height: 1.45; color: var(--ink-2); cursor: pointer; }
+.check input { width: 20px; height: 20px; margin: 1px 0 0; accent-color: var(--ink); }
 </style>
 <div id="app" class="app">
   <div id="stage" class="stage" role="application" aria-label="Map of people and their connections">
@@ -1088,6 +1103,7 @@ a.btn { text-decoration: none; }
   <input id="file-image" type="file" accept="image/*" hidden>
   <input id="file-photo" type="file" accept="image/*" hidden>
   <input id="file-import" type="file" accept=".json,application/json" hidden>
+  <input id="file-whatsapp" type="file" accept=".zip,.txt,application/zip,text/plain" hidden>
   <input id="file-contacts" type="file" accept=".vcf,.vcard,.csv,text/vcard,text/x-vcard,text/csv,text/comma-separated-values" hidden>
 </div>
 <script>
@@ -1157,6 +1173,7 @@ a.btn { text-decoration: none; }
     x: '<path d="M18 6 6 18M6 6l12 12"/>',
     back: '<path d="m15 18-6-6 6-6"/>',
     right: '<path d="m9 18 6-6-6-6"/>',
+    chat: '<path d="M20 11.6a8 8 0 0 1-11.8 7L4 19.8l1.3-4A8 8 0 1 1 20 11.6Z"/>',
     link: '<path d="M9.5 14.5 14.5 9.5"/><path d="m11 6.5 1.4-1.4a4.2 4.2 0 0 1 6 6L17 12.5"/><path d="m13 17.5-1.4 1.4a4.2 4.2 0 0 1-6-6L7 11.5"/>',
     edit: '<path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4Z"/><path d="m13.5 6.5 4 4"/>',
     trash: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
@@ -3250,7 +3267,7 @@ a.btn { text-decoration: none; }
     if (p.email || p.phone || p.link) {
       const rows = [];
       if (p.email) rows.push(contactRow('mail', p.email));
-      if (p.phone) rows.push(contactRow('phone', p.phone));
+      if (p.phone) rows.push(contactRow('phone', p.phone, waButton(p, { cls: 'icon-btn' })));
       if (p.link && /^https?:\/\//i.test(p.link)) rows.push(h('div', { class: 'contact-row' }, icon('link', 18), h('a', { href: p.link, target: '_blank', rel: 'noopener noreferrer' }, p.link.replace(/^https?:\/\/(www\.)?/i, '').replace(/\/$/, '')), h('button', { class: 'icon-btn', type: 'button', 'aria-label': 'Copy link', onclick: (e) => copyText(p.link, e.currentTarget) }, icon('copy', 17))));
       body.append(h('div', { class: 'eyebrow' }, 'Contact'), h('div', { class: 'contact' }, rows));
     }
@@ -3261,15 +3278,15 @@ a.btn { text-decoration: none; }
     return { title: '', body, size: 'peek' };
   }
   VIEWS.person.live = true;
-  function contactRow(ic, value) {
-    return h('div', { class: 'contact-row' }, icon(ic, 18), h('span', {}, value), h('button', { class: 'icon-btn', type: 'button', 'aria-label': 'Copy ' + value, onclick: (e) => copyText(value, e.currentTarget) }, icon('copy', 17)));
+  function contactRow(ic, value, extra) {
+    return h('div', { class: 'contact-row' }, icon(ic, 18), h('span', {}, value), extra || '', h('button', { class: 'icon-btn', type: 'button', 'aria-label': 'Copy ' + value, onclick: (e) => copyText(value, e.currentTarget) }, icon('copy', 17)));
   }
   async function copyText(text, btn) {
     try {
       await navigator.clipboard.writeText(text);
       toast('Copied');
     } catch {
-      const sp = btn && btn.previousElementSibling;
+      const sp = btn && btn.parentElement && btn.parentElement.querySelector('span, a');
       if (sp) {
         const r = document.createRange();
         r.selectNodeContents(sp);
@@ -3457,6 +3474,7 @@ a.btn { text-decoration: none; }
       lines.push(h('span', {}, p.lastContact ? `Last talked ${relDays(dayNum(p.lastContact) - todayNum())} (${fmtDay(p.lastContact)}). Pick how often to catch up.` : 'Pick how often you want to catch up and Kith will remind you.'));
     }
     wrap.append(h('div', { class: 'touch-card' + state }, icon(i && i.left <= 0 ? 'bell' : 'clock', 20), h('div', {}, lines)));
+    wrap.append(h('div', { class: 'touch-acts' }, waButton(p, { label: 'Message on WhatsApp' }), h('button', { class: 'btn sm ghost', type: 'button', onclick: () => openSheet('waHelp', {}) }, icon('upload', 15), 'Sync a WhatsApp chat')));
     wrap.append(cadencePicker(i ? i.cadence : 0, (d) => setCadence(p.id, d), true));
     const log = p.log || [];
     if (log.length) {
@@ -3510,7 +3528,7 @@ a.btn { text-decoration: none; }
     const soon = withRem.filter((r) => r.i.left > 7 && r.i.left <= 30).sort(sortLeft);
     const later = withRem.filter((r) => r.i.left > 30).sort(sortLeft);
     const bdays = rows.filter((r) => r.b && r.b.days <= 30).sort((a, b) => a.b.days - b.b.days);
-    const caught = (p) => h('button', { class: 'btn sm', type: 'button', onclick: () => logTouch(p.id) }, icon('check', 15), 'Caught up');
+    const caught = (p) => h('div', { class: 'row-acts' }, waButton(p, { cls: 'btn sm sq' }), h('button', { class: 'btn sm', type: 'button', onclick: () => logTouch(p.id) }, icon('check', 15), 'Caught up'));
     const body = h('div', {});
     const section = (label, list, render) => {
       if (!list.length) return;
@@ -3531,6 +3549,7 @@ a.btn { text-decoration: none; }
       body.append(h('div', { class: 'eyebrow' }, 'Set up reminders'), h('div', { class: 'touch-list' }, sugg.map((p) => touchRow(p, roleLine(p) || relsOf(p.id).filter((r) => r.a === ME || r.b === ME).map((r) => relSentence(r))[0] || '', h('div', { class: 'mini-select' }, cadenceSelect(0, (d) => setCadence(p.id, d)))))));
     }
     if (others().length < 5) body.append(h('div', { class: 'eyebrow' }, 'Bring in more people'), h('button', { class: 'btn', type: 'button', onclick: () => openSheet('importHelp', {}) }, icon('contacts', 18), 'Import your contacts'));
+    body.append(h('div', { class: 'eyebrow' }, 'Talked on WhatsApp?'), h('button', { class: 'btn', type: 'button', onclick: () => openSheet('waHelp', {}) }, icon('chat', 18), 'Sync a WhatsApp chat'));
     return { title: 'Keep in touch', body };
   };
   VIEWS.touch.live = true;
@@ -3974,6 +3993,403 @@ a.btn { text-decoration: none; }
         onData();
       },
     });
+  }
+
+  /* ---------- WhatsApp ---------- */
+  // WhatsApp keeps chats to itself, so Kith reads the file its Export Chat makes (a .txt, or on iPhone a .zip holding
+  // _chat.txt). It works out who wrote on which days, then updates when you last talked, adds the chat to the
+  // catch-up history and suggests how often to check in. The messages themselves are never saved.
+  const WA_STAMP_IOS = /^\[(\d{1,4})([./-])(\d{1,2})[./-](\d{1,4}),?\s+(\d{1,2})[:.](\d{2})(?:[:.]\d{2})?\s*(?:([ap])\.?\s?m\.?)?\]\s?([\s\S]*)$/i;
+  const WA_STAMP_ANDROID = /^(\d{1,4})([./-])(\d{1,2})[./-](\d{1,4}),?\s+(\d{1,2})[:.](\d{2})(?:[:.]\d{2})?\s*(?:([ap])\.?\s?m\.?)?\s*[-–]\s([\s\S]*)$/i;
+  const waClean = (line) => line.replace(/[‎‏‪-‮⁦-⁩﻿]/g, '').replace(/[  ]/g, ' ');
+  const waStamp = (line) => WA_STAMP_IOS.exec(line) || WA_STAMP_ANDROID.exec(line);
+  const waStrip = (s) => String(s || '').replace(/[\p{Extended_Pictographic}\u{1F3FB}-\u{1F3FF}️‍]/gu, '').replace(/\s+/g, ' ').trim();
+  const nameKey = (s) => waStrip(s).normalize('NFKD').replace(/\p{M}/gu, '').replace(/[^\p{L}\p{N}]+/gu, ' ').trim().toLowerCase();
+  const isPhoneLabel = (s) => /^\+?[\d\s().-]{7,}$/.test(String(s || '').trim()) && String(s).replace(/\D/g, '').length >= 7;
+  const phoneTail = (s) => String(s || '').replace(/\D/g, '').slice(-9);
+  const waShort = (label) => waStrip(label) || String(label || '');
+  const waName = (label, title) => (isPhoneLabel(label) && title && !isPhoneLabel(title) ? waStrip(title) : waShort(label));
+
+  function looksLikeWhatsApp(text) {
+    const lines = String(text || '').split(/\r?\n/).slice(0, 80).map(waClean).filter((l) => l.trim());
+    const hits = lines.filter((l) => waStamp(l)).length;
+    return hits >= 2 && hits >= lines.length * 0.3;
+  }
+  function parseWhatsApp(text) {
+    const raw = [];
+    for (let line of String(text || '').replace(/\r\n?/g, '\n').split('\n')) {
+      line = waClean(line);
+      const m = waStamp(line);
+      if (m) {
+        const [, a, sep, b, c, hh, mm, ap, rest] = m;
+        const sm = /^(.{1,80}?):\s([\s\S]*)$/.exec(rest);
+        raw.push({ a: +a, b: +b, c: +c, sep, ymd: a.length === 4, h: ap ? (+hh % 12) + (/p/i.test(ap) ? 12 : 0) : +hh, mi: +mm, from: sm ? sm[1].trim() : '', text: sm ? sm[2] : rest });
+      } else if (raw.length && line.trim()) raw[raw.length - 1].text += '\n' + line;
+    }
+    if (!raw.length) return null;
+    const ymdOf = (r, dayFirst) => {
+      if (r.ymd) return [r.a, r.b, r.c];
+      const [d, mo] = dayFirst ? [r.a, r.b] : [r.b, r.a];
+      return [r.c < 100 ? 2000 + r.c : r.c, mo, d];
+    };
+    // Day/month order: a part over 12 settles it. Otherwise take the order that puts no message in the future and
+    // keeps the chat in time order; failing that, dotted dates are day-first, and so is everywhere but the US.
+    let dayFirst;
+    if (raw.some((r) => !r.ymd && r.a > 12)) dayFirst = true;
+    else if (raw.some((r) => !r.ymd && r.b > 12)) dayFirst = false;
+    else {
+      const tomorrow = Date.now() + DAY;
+      const oddness = (df) => {
+        let n = 0;
+        let prev = -Infinity;
+        for (const r of raw) {
+          const [y, mo, d] = ymdOf(r, df);
+          const t = Date.UTC(y, mo - 1, d, r.h, r.mi);
+          if (t > tomorrow) n += 1000;
+          if (t < prev) n++;
+          prev = t;
+        }
+        return n;
+      };
+      const df = oddness(true);
+      const mf = oddness(false);
+      dayFirst = df !== mf ? df < mf : raw.some((r) => r.sep === '.') || !/^en-US/i.test(navigator.language || '');
+    }
+    const msgs = [];
+    for (const r of raw) {
+      const [y, mo, d] = ymdOf(r, dayFirst);
+      if (!(y > 2008 && mo >= 1 && mo <= 12 && d >= 1 && d <= 31)) continue;
+      msgs.push({ day: `${y}-${pad2(mo)}-${pad2(d)}`, from: r.from, text: r.text.trim() });
+    }
+    return msgs.length ? msgs : null;
+  }
+  // "WhatsApp Chat - Sarah Chen.zip", "WhatsApp Chat with Sarah Chen.txt", "צ'אט WhatsApp עם שרה.txt" → the name
+  const WA_JOIN = new Set(['chat', 'with', 'mit', 'con', 'avec', 'com', 'met', 'de', 'del', 'med', 'z', 'ze', 'עם', "צ'אט", 'צ׳אט', '-', '–', '—', ':']);
+  function waTitle(fileName) {
+    const base = String(fileName || '').replace(/\.(txt|zip)$/i, '').replace(/_/g, ' ').trim();
+    if (!base || /^chat$/i.test(base)) return '';
+    const toks = base.replace(/whats\s?app[-\s]?/gi, ' ').split(/\s+/).filter(Boolean);
+    while (toks.length && WA_JOIN.has(toks[0].toLowerCase())) toks.shift();
+    return toks.join(' ').replace(/\s*\(\d+\)$/, '').trim();
+  }
+  // The iPhone export is a zip; read _chat.txt out of it with the browser's own inflater.
+  async function unzipChat(buf) {
+    const u8 = new Uint8Array(buf);
+    const dv = new DataView(buf);
+    let end = -1;
+    for (let i = u8.length - 22; i >= Math.max(0, u8.length - 65557); i--) {
+      if (dv.getUint32(i, true) === 0x06054b50) { end = i; break; }
+    }
+    if (end < 0) throw new Error('not-zip');
+    const entries = [];
+    let off = dv.getUint32(end + 16, true);
+    for (let n = dv.getUint16(end + 10, true); n > 0 && dv.getUint32(off, true) === 0x02014b50; n--) {
+      const nameLen = dv.getUint16(off + 28, true);
+      entries.push({ name: new TextDecoder().decode(u8.subarray(off + 46, off + 46 + nameLen)), method: dv.getUint16(off + 10, true), size: dv.getUint32(off + 20, true), at: dv.getUint32(off + 42, true) });
+      off += 46 + nameLen + dv.getUint16(off + 30, true) + dv.getUint16(off + 32, true);
+    }
+    const e = entries.find((x) => /(^|\/)_chat\.txt$/i.test(x.name)) || entries.find((x) => /\.txt$/i.test(x.name) && !/__MACOSX/.test(x.name));
+    if (!e) throw new Error('no-chat');
+    const start = e.at + 30 + dv.getUint16(e.at + 26, true) + dv.getUint16(e.at + 28, true);
+    const data = u8.subarray(start, start + e.size);
+    if (e.method === 0) return new TextDecoder().decode(data);
+    if (e.method !== 8 || typeof DecompressionStream === 'undefined') throw new Error('unzip');
+    const out = await new Response(new Blob([data]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).arrayBuffer();
+    return new TextDecoder().decode(out);
+  }
+  async function importWhatsAppFile(file) {
+    let text = '';
+    try {
+      text = /\.zip$/i.test(file.name) || /zip/.test(file.type) ? await unzipChat(await file.arrayBuffer()) : await file.text();
+    } catch (e) {
+      toast(e && e.message === 'no-chat' ? 'No chat in that zip. In WhatsApp, use Export Chat and choose the file it makes.' : 'That file couldn’t be opened. Choose the .zip (iPhone) or .txt (Android) WhatsApp made.');
+      return;
+    }
+    openWhatsApp(text, file.name);
+  }
+  function openWhatsApp(text, fileName, source) {
+    const msgs = parseWhatsApp(text);
+    const senders = new Map();
+    for (const m of msgs || []) if (m.from) senders.set(m.from, (senders.get(m.from) || 0) + 1);
+    if (!msgs || !senders.size) { toast('That doesn’t look like a WhatsApp chat. In WhatsApp, open the chat and use Export Chat.'); return; }
+    const title = waTitle(fileName);
+    openSheet('waReview', { msgs, senders, title, source: source || (title ? `your chat with ${title}` : 'the chat') }, { root: true });
+  }
+  function waMatch(label) {
+    const ps = others();
+    if (isPhoneLabel(label)) {
+      const t = phoneTail(label);
+      const hit = ps.filter((p) => p.phone && phoneTail(p.phone) === t);
+      return hit.length === 1 ? hit[0].id : null;
+    }
+    const k = nameKey(label);
+    if (!k) return null;
+    const exact = ps.filter((p) => nameKey(p.name) === k);
+    if (exact.length) return exact.length === 1 ? exact[0].id : null;
+    // "Sarah" or "Sarah C" in WhatsApp for "Sarah Chen" on the map, but only when exactly one person fits
+    const toks = k.split(' ');
+    const fits = ps.filter((p) => {
+      const pt = nameKey(p.name).split(' ');
+      return pt[0] === toks[0] && toks.slice(1).every((t, i) => pt[i + 1] && pt[i + 1].startsWith(t));
+    });
+    return fits.length === 1 ? fits[0].id : null;
+  }
+  const WA_YOU = /^(you|du|tú|tu|vous|você|jij|ty|אתה|את|אני)$/i;
+  function waWhoIsMe(names, title) {
+    const you = names.find((n) => WA_YOU.test(waStrip(n)));
+    if (you) return you;
+    const mine = nameKey(S.people[ME] && S.people[ME].name);
+    if (mine) {
+      const hit = names.find((n) => nameKey(n) === mine);
+      if (hit) return hit;
+    }
+    if (names.length !== 2) return '';
+    const tk = nameKey(title);
+    const them = tk && names.find((n) => nameKey(n) === tk);
+    if (them) return names.find((n) => n !== them);
+    if (mine) {
+      const firstName = names.filter((n) => nameKey(n).split(' ')[0] === mine.split(' ')[0]);
+      if (firstName.length === 1) return firstName[0];
+    }
+    const onMap = names.filter((n) => waMatch(n));
+    return onMap.length === 1 ? names.find((n) => n !== onMap[0]) : '';
+  }
+  // The last day you both wrote counts as the last time you talked; the usual gap between chat days suggests a rhythm.
+  function waStats(msgs, label, me) {
+    const theirs = new Set();
+    const mine = new Set();
+    let count = 0;
+    for (const m of msgs) {
+      if (m.from === label) { theirs.add(m.day); count++; }
+      else if (me && m.from === me) mine.add(m.day);
+    }
+    const both = [...theirs].filter((d) => mine.has(d));
+    const days = (both.length ? both : [...theirs]).sort();
+    const yearAgo = todayNum() - 365;
+    const recent = days.map(dayNum).filter((n) => n >= yearAgo);
+    let every = 0;
+    if (recent.length >= 3) {
+      const gaps = recent.slice(1).map((n, i) => n - recent[i]).sort((a, b) => a - b);
+      every = gaps[Math.floor(gaps.length / 2)];
+    }
+    return { count, last: days[days.length - 1] || '', every };
+  }
+  function waNote(msgs, label, me, name) {
+    const lines = [];
+    let size = 0;
+    for (let i = msgs.length - 1; i >= 0 && size < 12000; i--) {
+      const m = msgs[i];
+      const who = m.from === label ? name : me && m.from === me ? 'Me' : '';
+      const t = m.text.replace(/\s+/g, ' ').slice(0, 400);
+      if (!who || !t || /\bomitted\b|<attached:|^<[^>]*>$/i.test(t)) continue;
+      const line = `${m.day} ${who}: ${t}`;
+      lines.push(line);
+      size += line.length;
+    }
+    return `My recent WhatsApp chat with ${name} ("Me" is me). Note what it tells me about ${name}, and anyone they mention, that is worth remembering: work, where they live, family, interests, plans, important dates. Skip small talk.\n\n${lines.reverse().join('\n')}`;
+  }
+
+  // Message someone on WhatsApp. Numbers saved without a country code borrow yours (from your own number, time zone or region).
+  const WA_CC = { US: '1', CA: '1', GB: '44', IE: '353', IL: '972', DE: '49', FR: '33', ES: '34', IT: '39', NL: '31', BE: '32', CH: '41', AT: '43', SE: '46', NO: '47', DK: '45', FI: '358', PL: '48', PT: '351', GR: '30', TR: '90', RU: '7', UA: '380', IN: '91', AE: '971', SA: '966', EG: '20', ZA: '27', NG: '234', AU: '61', NZ: '64', JP: '81', KR: '82', CN: '86', HK: '852', SG: '65', PH: '63', TH: '66', BR: '55', MX: '52', AR: '54', CL: '56', CO: '57' };
+  const WA_TZ = { 'Asia/Jerusalem': 'IL', 'Asia/Tel_Aviv': 'IL', 'Europe/London': 'GB', 'Europe/Dublin': 'IE', 'Europe/Berlin': 'DE', 'Europe/Paris': 'FR', 'Europe/Madrid': 'ES', 'Europe/Rome': 'IT', 'Europe/Amsterdam': 'NL', 'Asia/Kolkata': 'IN', 'Asia/Dubai': 'AE', 'Australia/Sydney': 'AU', 'Australia/Melbourne': 'AU', 'America/New_York': 'US', 'America/Chicago': 'US', 'America/Denver': 'US', 'America/Los_Angeles': 'US', 'America/Phoenix': 'US', 'America/Toronto': 'CA', 'America/Vancouver': 'CA', 'America/Sao_Paulo': 'BR', 'America/Mexico_City': 'MX' };
+  function myCallingCode() {
+    const codes = new Set(Object.values(WA_CC));
+    const mine = S.people[ME] && S.people[ME].phone;
+    if (mine && /^\s*(\+|00)/.test(mine)) {
+      const d = mine.replace(/\D/g, '').replace(/^00/, '');
+      for (const n of [3, 2, 1]) if (codes.has(d.slice(0, n))) return d.slice(0, n);
+    }
+    let tz = '';
+    try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch { /* no time zone */ }
+    if (WA_TZ[tz]) return WA_CC[WA_TZ[tz]];
+    for (const l of [...(navigator.languages || []), navigator.language]) {
+      const r = /[-_]([a-z]{2})\b/i.exec(l || '');
+      if (r && WA_CC[r[1].toUpperCase()]) return WA_CC[r[1].toUpperCase()];
+    }
+    return '';
+  }
+  function waNumber(phone) {
+    const s = String(phone || '').trim();
+    let d = s.replace(/\D/g, '');
+    if (d.length < 7) return '';
+    if (s.startsWith('+')) return d;
+    if (d.startsWith('00')) return d.slice(2);
+    const cc = myCallingCode();
+    if (cc === '1' && d.length === 11 && d[0] === '1') return d;
+    if (d[0] === '0') d = d.replace(/^0+/, '');
+    else if (cc && d.startsWith(cc) && d.length > 10) return d;
+    return cc + d;
+  }
+  let waPending = null;
+  function waOffer() {
+    if (!waPending) return;
+    const { id, at } = waPending;
+    waPending = null;
+    if (Date.now() - at > 6 * 3600e3 || !S.people[id]) return;
+    toast(`Caught up with ${nameOf(id, false)}?`, { action: 'Log it', run: () => logTouch(id), ms: 10000 });
+  }
+  function waButton(p, { label = '', cls = 'btn sm' } = {}) {
+    const n = p && p.phone ? waNumber(p.phone) : '';
+    if (!n) return '';
+    const go = () => {
+      waPending = { id: p.id, at: Date.now() };
+      // back from WhatsApp (or it opened in a tab and you stayed here): offer to log the catch-up
+      setTimeout(() => { if (document.visibilityState === 'visible') waOffer(); }, 2500);
+    };
+    return h('a', { class: cls, href: `https://wa.me/${n}`, target: '_blank', rel: 'noopener noreferrer', 'aria-label': `Message ${nameOf(p.id, false)} on WhatsApp`, title: 'WhatsApp', onclick: go }, icon('chat', label ? 16 : 18), label);
+  }
+
+  VIEWS.waHelp = () => {
+    const step = (title, open, ...lines) => h('details', { class: 'howto', open }, h('summary', {}, title, icon('right', 16)), h('ol', {}, lines.map((l) => h('li', {}, l))));
+    const ios = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const body = h(
+      'div',
+      { class: 'form' },
+      h('p', { class: 'muted-note' }, 'WhatsApp doesn’t let other apps read your chats, so export one and choose it here. Kith updates when you last talked, adds it to your catch-ups and suggests how often to check in. It keeps only the dates, never the messages.'),
+      h('button', { class: 'btn primary', type: 'button', onclick: () => { E.fileWhatsapp.value = ''; E.fileWhatsapp.click(); } }, icon('upload', 18), 'Choose the exported chat'),
+      h('div', { class: 'eyebrow' }, 'How to export a chat'),
+      step('iPhone', ios, 'In WhatsApp, open the chat and tap the person’s name at the top.', 'Scroll down, tap Export Chat, then Without Media.', 'Tap Save to Files, then come back here and choose the .zip file.'),
+      step('Android', /android/i.test(navigator.userAgent), 'In WhatsApp, open the chat and tap ⋮ → More → Export chat.', 'Choose Without media and save the .txt file to your phone or Drive.', 'Come back here and choose that file.'),
+      h('p', { class: 'muted-note' }, 'Do it again any time to bring the dates up to date. You can also drop the file on the map, or copy a few messages in WhatsApp and paste them here.'),
+    );
+    return { title: 'Sync a WhatsApp chat', body };
+  };
+
+  VIEWS.waReview = (args) => {
+    const { msgs, senders, title } = args;
+    const names = [...senders.keys()].sort((a, b) => senders.get(b) - senders.get(a));
+    const st = args._st || (args._st = { me: waWhoIsMe(names, title), pick: {}, cad: null, claude: false });
+    if (!args._stats) args._stats = new Map();
+    const statOf = (n) => {
+      const k = n + '\u0000' + st.me;
+      if (!args._stats.has(k)) args._stats.set(k, waStats(msgs, n, st.me));
+      return args._stats.get(k);
+    };
+    const people = names.filter((n) => n !== st.me);
+    const group = people.length > 1;
+    for (const n of people) if (!st.pick[n]) st.pick[n] = { on: !group, to: waMatch(n) || (!group && title ? waMatch(title) : null) || 'new' };
+    const chosen = people.filter((n) => st.pick[n].on);
+    const targetOf = (n) => (st.pick[n].to !== 'new' && S.people[st.pick[n].to]) || null;
+    const body = h('div', {});
+    const d0 = msgs[0].day;
+    const d1 = msgs[msgs.length - 1].day;
+    body.append(h('p', { class: 'review-note' }, `${msgs.length === 1 ? '1 message' : msgs.length.toLocaleString() + ' messages'} ${d0 === d1 ? 'on ' + fmtDay(d0) : `from ${fmtDay(d0)} to ${fmtDay(d1)}`} in ${args.source}. Kith keeps only when you talked, not what was said.`));
+    if (names.length >= 2 && names.length <= 12) {
+      body.append(
+        h('div', { class: 'field' }, h('span', { class: 'lbl' }, 'Which one is you?'), h('div', { class: 'choice small' }, names.map((n) => h('button', { type: 'button', 'aria-pressed': String(st.me === n), onclick: () => { st.me = st.me === n ? '' : n; st.pick = {}; st.cad = null; renderSheet(false); } }, waShort(n))))),
+      );
+      if (!st.me) body.append(h('p', { class: 'muted-note' }, 'Tap your own name so Kith knows who’s who.'));
+    }
+    body.append(h('div', { class: 'eyebrow' }, group ? `People in this chat · ${people.length}` : 'Update'));
+    const opts = others().slice().sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+    const list = h('div', { class: 'imp-list' });
+    for (const n of people.slice(0, 60)) {
+      const pk = st.pick[n];
+      const s = statOf(n);
+      const tgt = targetOf(n);
+      const newName = waName(n, group ? '' : title);
+      const sel = h('select', { class: 'input', 'aria-label': `Who is ${waShort(n)} on your map?` }, h('option', { value: 'new' }, `Add ${newName} as a new person`), opts.map((p) => h('option', { value: p.id }, p.name || 'Unnamed')));
+      sel.value = tgt ? tgt.id : 'new';
+      sel.addEventListener('change', () => { pk.to = sel.value; sel.blur(); renderSheet(false); });
+      list.append(
+        h(
+          'div',
+          { class: 'wa-row' },
+          h('button', { class: 'toggle', type: 'button', 'aria-pressed': String(pk.on), 'aria-label': `Update ${waShort(n)}`, onclick: () => { pk.on = !pk.on; renderSheet(false); } }, icon('check')),
+          avatar(tgt || { id: 'x', name: newName }),
+          h(
+            'div',
+            {},
+            h('div', { class: 't' }, waShort(n), h('span', { class: 'badge ' + (tgt ? 'upd' : 'new') }, tgt ? 'On map' : 'New')),
+            h('div', { class: 'd' }, s.last ? `Last chatted ${relDays(dayNum(s.last) - todayNum())} · ${s.count === 1 ? '1 message' : s.count.toLocaleString() + ' messages'}` : 'They didn’t write in this chat'),
+            sel,
+          ),
+        ),
+      );
+    }
+    if (people.length > 60) list.append(h('p', { class: 'muted-note', style: 'padding:6px 10px' }, `Showing the 60 most active of ${people.length}.`));
+    body.append(list);
+    const one = chosen.length === 1 ? chosen[0] : null;
+    const oneName = one ? (targetOf(one) ? nameOf(targetOf(one).id, false) : waName(one, group ? '' : title)) : '';
+    const suggested = one && statOf(one).every ? nearestCadence(Math.max(7, statOf(one).every * 1.5)) : 0;
+    const needRem = chosen.filter((n) => !(targetOf(n) && targetOf(n).cadence));
+    const cad = needRem.length ? (st.cad != null ? st.cad : suggested) : 0;
+    if (needRem.length) {
+      body.append(
+        h(
+          'div',
+          { class: 'field', style: 'margin-top:14px' },
+          h('label', { for: 'wa-cad' }, one ? `Remind me to keep in touch with ${oneName}` : 'Remind me to keep in touch with them'),
+          cadenceSelect(cad, (d) => { st.cad = d; }, 'wa-cad'),
+          suggested ? h('p', { class: 'muted-note' }, `Suggested from how often you chat: ${cadenceLabel(suggested).toLowerCase()}.`) : '',
+        ),
+      );
+    }
+    if (AI.ok && one) {
+      const cb = h('input', { type: 'checkbox', id: 'wa-ai' });
+      cb.checked = st.claude;
+      cb.addEventListener('change', () => { st.claude = cb.checked; });
+      body.append(h('label', { class: 'check', for: 'wa-ai' }, cb, h('span', {}, `Also let Claude read the latest messages for new details about ${oneName}: work, family, plans. You check them before anything is saved.`)));
+    }
+    const go = h('button', { class: 'btn primary', type: 'button', disabled: !chosen.length, onclick: () => applyWhatsApp(args, chosen, st.cad != null ? st.cad : cad) }, icon('check', 18), chosen.length > 1 ? `Update ${chosen.length} people` : 'Update');
+    const foot = h('div', { class: 'foot-row' }, h('button', { class: 'btn', type: 'button', onclick: closeSheet }, 'Cancel'), go);
+    return { title: 'WhatsApp chat', body, foot };
+  };
+
+  function applyWhatsApp(args, chosen, cadence) {
+    const st = args._st;
+    const today = todayStr();
+    const before = {};
+    const created = [];
+    const done = [];
+    // a new person goes in a free spot near you
+    const freeSpot = () => {
+      const c = pos(ME);
+      const taken = peopleList().map((p) => pos(p.id));
+      for (let r = 240; r < 1400; r += 120) {
+        for (let k = 0; k < 12; k++) {
+          const a = (k / 12) * Math.PI * 2 + r / 300;
+          const x = c.x + r * Math.cos(a);
+          const y = c.y + r * Math.sin(a);
+          if (taken.every((q) => Math.hypot(q.x - x, q.y - y) > 160)) return { x: Math.round(x), y: Math.round(y) };
+        }
+      }
+      return { x: Math.round(c.x + 320), y: Math.round(c.y) };
+    };
+    for (const n of chosen) {
+      const s = waStats(args.msgs, n, st.me);
+      if (!s.last) continue;
+      let id = st.pick[n].to;
+      if (id === 'new' || !S.people[id]) {
+        id = newId('p');
+        const at = freeSpot();
+        savePerson({ id, name: waName(n, chosen.length === 1 ? args.title : ''), title: '', company: '', location: '', traits: [], details: '', email: '', phone: isPhoneLabel(n) ? n.trim() : '', link: '', birthday: '', photo: '', cadence: 0, cadenceFrom: '', x: at.x, y: at.y });
+        created.push(id);
+      } else if (!before[id]) before[id] = clone(S.people[id]);
+      const next = clone(S.people[id]);
+      if (!next.lastContact || s.last > next.lastContact) next.lastContact = s.last;
+      if (!(next.log || []).some((e) => e.d === s.last)) next.log = [{ d: s.last, note: 'WhatsApp' }, ...(next.log || [])].sort((a, b) => (a.d < b.d ? 1 : a.d > b.d ? -1 : 0)).slice(0, 60);
+      if (cadence && !next.cadence) { next.cadence = cadence; next.cadenceFrom = today; }
+      if (!next.phone && isPhoneLabel(n)) next.phone = n.trim();
+      savePerson(next);
+      done.push({ id, label: n });
+    }
+    onData();
+    closeSheet();
+    if (!done.length) { toast('Nothing to update from that chat.'); return; }
+    const one = done.length === 1 ? S.people[done[0].id] : null;
+    toast(one ? `${nameOf(one.id, false)}: last talked ${relDays(dayNum(one.lastContact) - todayNum())}` : `Updated ${plural(done.length, 'person', 'people')} from the chat`, {
+      action: 'Undo',
+      ms: 8000,
+      run: () => {
+        for (const id of created) removeDoc(id);
+        for (const v of Object.values(before)) savePerson(v);
+        withMe(S.people);
+        onData();
+      },
+    });
+    if (one) setTimeout(() => selectPerson(one.id, { open: !st.claude, center: true }), 80);
+    if (one && st.claude) readNote(waNote(args.msgs, done[0].label, st.me, one.name || waShort(done[0].label)));
   }
 
   /* ---------- relationship ---------- */
@@ -4700,6 +5116,7 @@ a.btn { text-decoration: none; }
         item('fit', 'Fit everyone on screen', '', () => { closeSheet(); setTimeout(() => fitAll(), 50); }),
         item('bell', 'Keep in touch', 'Catch-ups that are due and upcoming birthdays', () => openSheet('touch', {}, { root: true })),
         item('contacts', 'Import contacts', 'From your phone, Google, Outlook or LinkedIn', () => openSheet('importHelp', {})),
+        item('chat', 'Sync a WhatsApp chat', 'See when you last talked, from an exported chat', () => openSheet('waHelp', {})),
         item('users', 'Edit your own details', 'Your name, work and notes about you', () => openSheet('personEdit', { id: ME })),
         item('download', 'Export a backup', 'Save everyone as a .json file', exportBackup),
         item('upload', 'Import a backup', 'Add people from a Kith .json file', () => { E.fileImport.value = ''; E.fileImport.click(); }),
@@ -5111,7 +5528,7 @@ a.btn { text-decoration: none; }
      Boot
      ===================================================================== */
   function grab() {
-    const ids = ['app', 'stage', 'world', 'edge-g', 'ghost', 'labels', 'nodes', 'filters', 'stats', 'sync', 'empty', 'composer', 'composer-note', 'input', 'btn-mic', 'btn-send', 'btn-image', 'attach', 'hint', 'sheet', 'sheet-grab', 'sheet-head', 'sheet-title', 'sheet-body', 'sheet-foot', 'sheet-back', 'sheet-close', 'toast', 'loader', 'loader-text', 'file-image', 'file-photo', 'file-import', 'drop-zone', 'btn-search', 'btn-add', 'btn-menu', 'btn-touch', 'touch-badge', 'file-contacts', 'btn-import-empty', 'due-banner', 'btn-zin', 'btn-zout', 'btn-fit', 'btn-example', 'btn-first'];
+    const ids = ['app', 'stage', 'world', 'edge-g', 'ghost', 'labels', 'nodes', 'filters', 'stats', 'sync', 'empty', 'composer', 'composer-note', 'input', 'btn-mic', 'btn-send', 'btn-image', 'attach', 'hint', 'sheet', 'sheet-grab', 'sheet-head', 'sheet-title', 'sheet-body', 'sheet-foot', 'sheet-back', 'sheet-close', 'toast', 'loader', 'loader-text', 'file-image', 'file-photo', 'file-import', 'drop-zone', 'btn-search', 'btn-add', 'btn-menu', 'btn-touch', 'touch-badge', 'file-contacts', 'file-whatsapp', 'btn-import-empty', 'due-banner', 'btn-zin', 'btn-zout', 'btn-fit', 'btn-example', 'btn-first'];
     for (const id of ids) E[id.replace(/-(\w)/g, (_, c) => c.toUpperCase())] = document.getElementById(id);
   }
   function wire() {
@@ -5122,6 +5539,8 @@ a.btn { text-decoration: none; }
     E.btnTouch.addEventListener('click', () => openSheet('touch', {}, { root: true }));
     E.btnImportEmpty.addEventListener('click', () => openSheet('importHelp', {}, { root: true }));
     E.fileContacts.addEventListener('change', () => { const f = E.fileContacts.files && E.fileContacts.files[0]; if (f) importContactsFile(f); });
+    E.fileWhatsapp.addEventListener('change', () => { const f = E.fileWhatsapp.files && E.fileWhatsapp.files[0]; if (f) importWhatsAppFile(f); });
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') waOffer(); });
     E.btnAdd.append(icon('userPlus'));
     E.btnMenu.append(icon('more'));
     E.btnZin.append(icon('plus', 19));
@@ -5172,6 +5591,7 @@ a.btn { text-decoration: none; }
       const img = imageFrom(e.clipboardData);
       const text = e.clipboardData && e.clipboardData.getData('text/plain');
       if (text && /BEGIN:VCARD/i.test(text)) { e.preventDefault(); openContacts(text, 'the pasted card'); return; }
+      if (text && looksLikeWhatsApp(text)) { e.preventDefault(); openWhatsApp(text, '', 'the pasted messages'); return; }
       if (img && !(text && text.trim())) { e.preventDefault(); attachImage(img); }
     });
     E.btnMic.addEventListener('click', () => toggleDictation(E.input, E.btnMic, () => submitComposer()));
@@ -5187,6 +5607,7 @@ a.btn { text-decoration: none; }
       if (!img && !text.trim()) return;
       e.preventDefault();
       if (/BEGIN:VCARD/i.test(text)) { openContacts(text, 'the pasted card'); return; }
+      if (looksLikeWhatsApp(text)) { openWhatsApp(text, '', 'the pasted messages'); return; }
       if (sheetIsOpen() && !isWide()) closeSheet();
       if (text.trim()) {
         E.input.value = (E.input.value.trim() ? E.input.value.trim() + '\n' : '') + text.trim();
@@ -5211,6 +5632,11 @@ a.btn { text-decoration: none; }
       const f = e.dataTransfer.files && e.dataTransfer.files[0];
       if (f && (/json/.test(f.type) || /\.json$/i.test(f.name))) { importFile(f); return; }
       if (f && (/vcard|csv/.test(f.type) || /\.(vcf|vcard|csv)$/i.test(f.name))) { importContactsFile(f); return; }
+      if (f && (/zip/.test(f.type) || /\.zip$/i.test(f.name))) { importWhatsAppFile(f); return; }
+      if (f && (f.type === 'text/plain' || /\.txt$/i.test(f.name))) {
+        f.text().then((t) => { if (looksLikeWhatsApp(t)) openWhatsApp(t, f.name); else { E.input.value = t.trim(); setMode('add'); grow(); E.input.focus(); } });
+        return;
+      }
       if (f && /^image\//.test(f.type)) { attachImage(f); return; }
       const text = e.dataTransfer.getData('text/plain');
       if (text) { E.input.value = text.trim(); setMode('add'); grow(); E.input.focus(); }
