@@ -4692,7 +4692,7 @@ a.btn, a.row-btn { text-decoration: none; }
 
   /* ---------- menu ---------- */
   // Saved from this page's Share menu, the phone gets the Kith icon; the app itself runs inside claude.ai, which sets its own.
-  const HOME_SCREEN_URL = 'https://roygeiger1-dev.github.io/connection/kith/?add';
+  const HOME_SCREEN_URL = 'https://roygeiger1-dev.github.io/Connection/kith/?add';
   VIEWS.menu = () => {
     const hasEx = peopleList().some((p) => p.example);
     const item = (ic, t, d, fn, cls = '') => h('button', { class: 'row-btn ' + cls, type: 'button', onclick: fn }, h('span', { class: 'ico' }, icon(ic)), h('div', {}, h('div', { class: 't' }, t), d ? h('div', { class: 'd' }, d) : ''), '');
