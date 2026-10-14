@@ -31,7 +31,7 @@ For each chat, in this order:
 - Name: match case- and accent-insensitively, ignoring emoji (`Sarah 🌸` = `Sarah`). A first name alone, or first name + initial, matches only when exactly one person fits.
 - Unmatched: collect them.
 
-Before writing, show the owner one short list - matched (name → date) and unmatched (most recent first, up to 40) - and ask which unmatched chats to add as new people. Default to adding none.
+Before writing, ask the owner about each person as a yes/no question, most recent chat first: "Sync Daniel Reyes? Last chatted 3 days ago" for matched people, "Add Dana Cohen (new)? Last chatted yesterday" for unmatched ones. Use `AskUserQuestion` with Yes / No options, up to 4 questions per call, and cap it at 40 people unless the owner wants more. Only the yeses get written.
 
 ## 4. Write
 

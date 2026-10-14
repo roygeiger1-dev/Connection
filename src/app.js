@@ -3146,88 +3146,87 @@
     return { title: 'Sync a WhatsApp chat', body };
   };
 
+  // One yes/no question per person in the chat, then the yeses are synced together (with Undo).
   VIEWS.waReview = (args) => {
     const { msgs, senders, title } = args;
     const names = [...senders.keys()].sort((a, b) => senders.get(b) - senders.get(a));
-    const st = args._st || (args._st = { me: waWhoIsMe(names, title), pick: {}, cad: null, claude: false });
+    const st = args._st || (args._st = { me: waWhoIsMe(names, title), askMe: false, step: 0, yes: {}, to: {}, cad: {}, claude: false });
     if (!args._stats) args._stats = new Map();
     const statOf = (n) => {
       const k = n + '\u0000' + st.me;
       if (!args._stats.has(k)) args._stats.set(k, waStats(msgs, n, st.me));
       return args._stats.get(k);
     };
-    const people = names.filter((n) => n !== st.me);
-    const group = people.length > 1;
-    for (const n of people) if (!st.pick[n]) st.pick[n] = { on: !group, to: waMatch(n) || (!group && title ? waMatch(title) : null) || 'new' };
-    const chosen = people.filter((n) => st.pick[n].on);
-    const targetOf = (n) => (st.pick[n].to !== 'new' && S.people[st.pick[n].to]) || null;
-    const body = h('div', {});
     const d0 = msgs[0].day;
     const d1 = msgs[msgs.length - 1].day;
+    const body = h('div', {});
     body.append(h('p', { class: 'review-note' }, `${msgs.length === 1 ? '1 message' : msgs.length.toLocaleString() + ' messages'} ${d0 === d1 ? 'on ' + fmtDay(d0) : `from ${fmtDay(d0)} to ${fmtDay(d1)}`} in ${args.source}. Kith keeps only when you talked, not what was said.`));
-    if (names.length >= 2 && names.length <= 12) {
+    const canPickMe = names.length >= 2 && names.length <= 12;
+    if (canPickMe && (!st.me || st.askMe)) {
       body.append(
-        h('div', { class: 'field' }, h('span', { class: 'lbl' }, 'Which one is you?'), h('div', { class: 'choice small' }, names.map((n) => h('button', { type: 'button', 'aria-pressed': String(st.me === n), onclick: () => { st.me = st.me === n ? '' : n; st.pick = {}; st.cad = null; renderSheet(false); } }, waShort(n))))),
+        h('div', { class: 'wa-q' }, h('div', { class: 'wa-ask' }, 'Which one is you?'), h('div', { class: 'wa-pick' }, names.map((n) => h('button', { class: 'btn', type: 'button', onclick: () => { st.me = n; st.askMe = false; st.step = 0; st.yes = {}; st.to = {}; st.cad = {}; renderSheet(true); } }, waShort(n))))),
       );
-      if (!st.me) body.append(h('p', { class: 'muted-note' }, 'Tap your own name so Kith knows who’s who.'));
+      return { title: 'WhatsApp chat', body };
     }
-    body.append(h('div', { class: 'eyebrow' }, group ? `People in this chat · ${people.length}` : 'Update'));
-    const opts = others().slice().sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-    const list = h('div', { class: 'imp-list' });
-    for (const n of people.slice(0, 60)) {
-      const pk = st.pick[n];
-      const s = statOf(n);
-      const tgt = targetOf(n);
-      const newName = waName(n, group ? '' : title);
-      const sel = h('select', { class: 'input', 'aria-label': `Who is ${waShort(n)} on your map?` }, h('option', { value: 'new' }, `Add ${newName} as a new person`), opts.map((p) => h('option', { value: p.id }, p.name || 'Unnamed')));
-      sel.value = tgt ? tgt.id : 'new';
-      sel.addEventListener('change', () => { pk.to = sel.value; sel.blur(); renderSheet(false); });
-      list.append(
-        h(
-          'div',
-          { class: 'wa-row' },
-          h('button', { class: 'toggle', type: 'button', 'aria-pressed': String(pk.on), 'aria-label': `Update ${waShort(n)}`, onclick: () => { pk.on = !pk.on; renderSheet(false); } }, icon('check')),
-          avatar(tgt || { id: 'x', name: newName }),
-          h(
-            'div',
-            {},
-            h('div', { class: 't' }, waShort(n), h('span', { class: 'badge ' + (tgt ? 'upd' : 'new') }, tgt ? 'On map' : 'New')),
-            h('div', { class: 'd' }, s.last ? `Last chatted ${relDays(dayNum(s.last) - todayNum())} · ${s.count === 1 ? '1 message' : s.count.toLocaleString() + ' messages'}` : 'They didn’t write in this chat'),
-            sel,
-          ),
-        ),
-      );
+    const people = names.filter((n) => n !== st.me).slice(0, 60);
+    const n = people[st.step];
+    if (!n) return null;
+    const solo = people.length === 1;
+    if (!(n in st.to)) st.to[n] = waMatch(n) || (solo && title ? waMatch(title) : null) || 'new';
+    const tgt = (st.to[n] !== 'new' && S.people[st.to[n]]) || null;
+    const newName = waName(n, solo ? title : '');
+    const call = tgt ? nameOf(tgt.id, false) : newName.split(' ')[0] || newName;
+    const s = statOf(n);
+    const suggested = s.every ? nearestCadence(Math.max(7, s.every * 1.5)) : 0;
+    const next = (answer) => {
+      st.yes[n] = answer;
+      if (st.step + 1 < people.length) { st.step++; renderSheet(true); return; }
+      finish();
+    };
+    const finish = () => {
+      const chosen = people.filter((p) => st.yes[p]);
+      if (!chosen.length) { closeSheet(); toast('Nothing synced'); return; }
+      const cads = {};
+      for (const p of chosen) cads[p] = st.cad[p] != null ? st.cad[p] : 0;
+      applyWhatsApp(args, chosen, cads);
+    };
+    if (!tgt || !tgt.cadence) { if (st.cad[n] == null) st.cad[n] = suggested; } else st.cad[n] = 0;
+    const sel = h('select', { class: 'input', id: 'wa-to', 'aria-label': `Who is ${waShort(n)} on your map?` }, h('option', { value: 'new' }, `Add ${newName} as a new person`), others().slice().sort((a, b) => (a.name || '').localeCompare(b.name || '')).map((p) => h('option', { value: p.id }, p.name || 'Unnamed')));
+    sel.value = tgt ? tgt.id : 'new';
+    sel.addEventListener('change', () => { st.to[n] = sel.value; delete st.cad[n]; sel.blur(); renderSheet(false); });
+    const more = h('div', { class: 'wa-more' }, h('div', { class: 'field' }, h('label', { for: 'wa-to' }, 'Who is this on your map?'), sel));
+    if (!tgt || !tgt.cadence) {
+      more.append(h('div', { class: 'field' }, h('label', { for: 'wa-cad' }, `Remind me to keep in touch with ${call}`), cadenceSelect(st.cad[n], (d) => { st.cad[n] = d; }, 'wa-cad'), suggested ? h('p', { class: 'muted-note' }, `Suggested from how often you chat: ${cadenceLabel(suggested).toLowerCase()}.`) : ''));
     }
-    if (people.length > 60) list.append(h('p', { class: 'muted-note', style: 'padding:6px 10px' }, `Showing the 60 most active of ${people.length}.`));
-    body.append(list);
-    const one = chosen.length === 1 ? chosen[0] : null;
-    const oneName = one ? (targetOf(one) ? nameOf(targetOf(one).id, false) : waName(one, group ? '' : title)) : '';
-    const suggested = one && statOf(one).every ? nearestCadence(Math.max(7, statOf(one).every * 1.5)) : 0;
-    const needRem = chosen.filter((n) => !(targetOf(n) && targetOf(n).cadence));
-    const cad = needRem.length ? (st.cad != null ? st.cad : suggested) : 0;
-    if (needRem.length) {
-      body.append(
-        h(
-          'div',
-          { class: 'field', style: 'margin-top:14px' },
-          h('label', { for: 'wa-cad' }, one ? `Remind me to keep in touch with ${oneName}` : 'Remind me to keep in touch with them'),
-          cadenceSelect(cad, (d) => { st.cad = d; }, 'wa-cad'),
-          suggested ? h('p', { class: 'muted-note' }, `Suggested from how often you chat: ${cadenceLabel(suggested).toLowerCase()}.`) : '',
-        ),
-      );
-    }
-    if (AI.ok && one) {
+    if (AI.ok && solo) {
       const cb = h('input', { type: 'checkbox', id: 'wa-ai' });
       cb.checked = st.claude;
       cb.addEventListener('change', () => { st.claude = cb.checked; });
-      body.append(h('label', { class: 'check', for: 'wa-ai' }, cb, h('span', {}, `Also let Claude read the latest messages for new details about ${oneName}: work, family, plans. You check them before anything is saved.`)));
+      more.append(h('label', { class: 'check', for: 'wa-ai' }, cb, h('span', {}, `Also let Claude read the latest messages for new details about ${call}: work, family, plans. You check them before anything is saved.`)));
     }
-    const go = h('button', { class: 'btn primary', type: 'button', disabled: !chosen.length, onclick: () => applyWhatsApp(args, chosen, st.cad != null ? st.cad : cad) }, icon('check', 18), chosen.length > 1 ? `Update ${chosen.length} people` : 'Update');
-    const foot = h('div', { class: 'foot-row' }, h('button', { class: 'btn', type: 'button', onclick: closeSheet }, 'Cancel'), go);
-    return { title: 'WhatsApp chat', body, foot };
+    const nav = h('div', { class: 'wa-nav' });
+    if (st.step > 0) nav.append(h('button', { class: 'btn sm ghost', type: 'button', onclick: () => { st.step--; renderSheet(true); } }, icon('back', 15), 'Back'));
+    if (canPickMe) nav.append(h('button', { class: 'btn sm ghost', type: 'button', onclick: () => { st.askMe = true; renderSheet(true); } }, `You’re ${waShort(st.me)} · change`));
+    if (people.length > 3 && st.step < people.length - 1) nav.append(h('button', { class: 'btn sm ghost', type: 'button', onclick: () => { for (const p of people.slice(st.step)) st.yes[p] = false; finish(); } }, 'Done, skip the rest'));
+    body.append(
+      h(
+        'div',
+        { class: 'wa-q' },
+        people.length > 1 ? h('div', { class: 'wa-step' }, `${st.step + 1} of ${people.length}`) : '',
+        avatar(tgt || { id: 'x', name: newName }, 'bigav'),
+        h('h3', { class: 'wa-name' }, waShort(n)),
+        h('p', { class: 'wa-sub' }, s.last ? `Last chatted ${relDays(dayNum(s.last) - todayNum())} · ${s.count === 1 ? '1 message' : s.count.toLocaleString() + ' messages'}` : 'They didn’t write in this chat'),
+        h('p', { class: 'wa-match' }, tgt ? `On your map as ${tgt.name}` : 'Not on your map yet. Yes adds them.'),
+        h('div', { class: 'wa-ask' }, `Sync ${call}?`),
+        h('div', { class: 'wa-yn' }, h('button', { class: 'btn', type: 'button', onclick: () => next(false) }, 'No'), h('button', { class: 'btn primary', type: 'button', disabled: !s.last, onclick: () => next(true) }, 'Yes')),
+        nav.childElementCount ? nav : '',
+        more,
+      ),
+    );
+    return { title: 'WhatsApp chat', body };
   };
 
-  function applyWhatsApp(args, chosen, cadence) {
+  function applyWhatsApp(args, chosen, cads) {
     const st = args._st;
     const today = todayStr();
     const before = {};
@@ -3250,7 +3249,8 @@
     for (const n of chosen) {
       const s = waStats(args.msgs, n, st.me);
       if (!s.last) continue;
-      let id = st.pick[n].to;
+      const cadence = cads[n] || 0;
+      let id = st.to[n];
       if (id === 'new' || !S.people[id]) {
         id = newId('p');
         const at = freeSpot();
@@ -4419,7 +4419,7 @@
      Boot
      ===================================================================== */
   function grab() {
-    const ids = ['app', 'stage', 'world', 'edge-g', 'ghost', 'labels', 'nodes', 'filters', 'stats', 'sync', 'empty', 'composer', 'composer-note', 'input', 'btn-mic', 'btn-send', 'btn-image', 'attach', 'hint', 'sheet', 'sheet-grab', 'sheet-head', 'sheet-title', 'sheet-body', 'sheet-foot', 'sheet-back', 'sheet-close', 'toast', 'loader', 'loader-text', 'file-image', 'file-photo', 'file-import', 'drop-zone', 'btn-search', 'btn-add', 'btn-menu', 'btn-touch', 'touch-badge', 'file-contacts', 'file-whatsapp', 'btn-import-empty', 'due-banner', 'btn-zin', 'btn-zout', 'btn-fit', 'btn-example', 'btn-first'];
+    const ids = ['app', 'stage', 'world', 'edge-g', 'ghost', 'labels', 'nodes', 'filters', 'stats', 'sync', 'empty', 'composer', 'composer-note', 'input', 'btn-mic', 'btn-send', 'btn-image', 'attach', 'hint', 'sheet', 'sheet-grab', 'sheet-head', 'sheet-title', 'sheet-body', 'sheet-foot', 'sheet-back', 'sheet-close', 'toast', 'loader', 'loader-text', 'file-image', 'file-photo', 'file-import', 'drop-zone', 'btn-search', 'btn-wa', 'btn-wa-empty', 'btn-add', 'btn-menu', 'btn-touch', 'touch-badge', 'file-contacts', 'file-whatsapp', 'btn-import-empty', 'due-banner', 'btn-zin', 'btn-zout', 'btn-fit', 'btn-example', 'btn-first'];
     for (const id of ids) E[id.replace(/-(\w)/g, (_, c) => c.toUpperCase())] = document.getElementById(id);
   }
   function wire() {
@@ -4427,6 +4427,9 @@
     E.ghost.style.display = 'none';
     E.btnSearch.append(icon('search'));
     E.btnTouch.prepend(icon('bell'));
+    E.btnWa.append(icon('chat'));
+    E.btnWa.addEventListener('click', () => openSheet('waHelp', {}, { root: true }));
+    E.btnWaEmpty.addEventListener('click', () => openSheet('waHelp', {}, { root: true }));
     E.btnTouch.addEventListener('click', () => openSheet('touch', {}, { root: true }));
     E.btnImportEmpty.addEventListener('click', () => openSheet('importHelp', {}, { root: true }));
     E.fileContacts.addEventListener('change', () => { const f = E.fileContacts.files && E.fileContacts.files[0]; if (f) importContactsFile(f); });

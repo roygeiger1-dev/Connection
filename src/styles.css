@@ -984,13 +984,20 @@ a.btn, a.icon-btn { text-decoration: none; }
 .touch-acts { display: flex; flex-wrap: wrap; gap: 8px; margin: -2px 0 12px; }
 .row-acts { display: flex; gap: 6px; flex: none; }
 .btn.sq { width: 36px; padding: 0; }
-.wa-row { display: grid; grid-template-columns: auto auto 1fr; gap: 12px; align-items: start; padding: 10px; border-radius: 14px; }
-.wa-row .toggle { margin-top: 4px; }
-.wa-row .miniav { width: 38px; height: 38px; font-size: 13px; }
-.wa-row > div { min-width: 0; display: grid; gap: 2px; }
-.wa-row .t { font: 650 14.5px/1.3 var(--f-body); display: flex; align-items: center; gap: 8px; min-width: 0; overflow-wrap: anywhere; }
-.wa-row .t .badge { height: 19px; font-size: 9.5px; }
-.wa-row .d { font-size: 13px; color: var(--muted); }
-.wa-row .input { margin-top: 6px; height: 40px; font-size: 14.5px; border-radius: 11px; }
+.wa-q { display: grid; justify-items: center; text-align: center; gap: 6px; padding: 6px 0 2px; }
+.wa-step { font: 500 11px/1 var(--f-mono); letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+.wa-q .bigav { width: 84px; height: 84px; font-size: 28px; }
+.wa-name { margin: 6px 0 0; font: 750 24px/1.1 var(--f-display); letter-spacing: -0.025em; overflow-wrap: anywhere; }
+.wa-sub { margin: 0; color: var(--muted); font-size: 14px; }
+.wa-match { margin: 0; font-size: 13.5px; color: var(--ink-2); }
+.wa-ask { margin-top: 14px; font: 720 20px/1.25 var(--f-display); letter-spacing: -0.015em; }
+.wa-yn { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; margin-top: 8px; }
+.wa-yn .btn { height: 56px; font-size: 16.5px; border-radius: 16px; }
+.wa-pick { display: grid; gap: 8px; width: 100%; margin-top: 10px; }
+.wa-pick .btn { height: 52px; font-size: 16px; }
+.wa-nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; width: 100%; }
+.wa-nav .btn { color: var(--muted); }
+.wa-more { width: 100%; text-align: left; display: grid; gap: 14px; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
+.wa-more .check { margin-top: 0; }
 .check { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: start; margin-top: 14px; padding: 12px 14px; border-radius: 14px; background: var(--surface-2); border: 1px solid var(--line); font-size: 14px; line-height: 1.45; color: var(--ink-2); cursor: pointer; }
 .check input { width: 20px; height: 20px; margin: 1px 0 0; accent-color: var(--ink); }
